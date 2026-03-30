@@ -66,7 +66,7 @@ export async function sendInviteEmail(data: InviteEmailData) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Clausr <onboarding@resend.dev>',
+      from: 'Clausr <no-reply@mail.clausr.tech>',
       to: toEmail,
       subject: `Join ${data.orgName} on Clausr`,
       html,
