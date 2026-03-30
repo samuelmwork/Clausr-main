@@ -3,11 +3,6 @@ import Razorpay from 'razorpay'
 import { createServiceClient } from '@/lib/supabase/server'
 import { getUserRole } from '@/lib/permissions'
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-})
-
 export async function POST(req: Request) {
   try {
     const { amount, planId, orgId } = await req.json()
@@ -22,6 +17,11 @@ export async function POST(req: Request) {
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
       return NextResponse.json({ error: 'Missing Razorpay env vars' }, { status: 500 })
     }
+
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    })
 
     // Verify user is authenticated and is an admin
     const { data: { user }, error: userError } = await supabase.auth.getUser()
