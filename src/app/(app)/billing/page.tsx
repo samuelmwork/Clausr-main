@@ -25,8 +25,7 @@ const PLANS = [
   {
     id: 'starter', 
     name: 'STARTER', 
-    price: 100,
-    priceLabel: '₹1 / month (test)', 
+    priceLabel: '₹999 / month', 
     period: '',
     description: 'For founders who want control without chaos.',
     features: [
@@ -41,8 +40,7 @@ const PLANS = [
   {
     id: 'pro', 
     name: 'PRO', 
-    price: 100,
-    priceLabel: '₹1 / month (test)', 
+    priceLabel: '₹1,999 / month', 
     period: '',
     description: 'For growing teams managing contracts together.',
     features: [
@@ -201,7 +199,6 @@ export default async function BillingPage() {
                 <RazorpayButton
                   planId={plan.id}
                   planName={plan.name}
-                  amount={plan.price}
                   orgId={member.org_id}
                   userEmail={user.email || ''}
                   userName={user.user_metadata?.full_name || ''}

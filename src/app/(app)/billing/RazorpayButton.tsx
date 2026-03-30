@@ -11,26 +11,37 @@ declare global {
 interface Props {
   planId: string
   planName: string
-  amount: number
   orgId: string
   userEmail: string
   userName: string
 }
 
-export default function RazorpayButton({ planId, planName, amount, orgId, userEmail, userName }: Props) {
+type RazorpaySuccessResponse = {
+  razorpay_payment_id: string
+  razorpay_subscription_id: string
+  razorpay_signature: string
+}
+
+export default function RazorpayButton({ planId, planName, orgId, userEmail, userName }: Props) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   async function handlePayment() {
     setLoading(true)
     try {
-      // 1. Create Razorpay order
+      // 1. Create Razorpay subscription
       const res = await fetch('/api/billing/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ planId, amount, orgId }),
+        body: JSON.stringify({ planId, orgId }),
       })
-      const { orderId, key } = await res.json()
+
+      const payload = await res.json()
+      if (!res.ok) {
+        throw new Error(payload.error || 'Failed to create subscription')
+      }
+
+      const { subscriptionId, key } = payload as { subscriptionId: string; key: string }
 
       // 2. Load Razorpay script
       if (!window.Razorpay) {
@@ -46,25 +57,31 @@ export default function RazorpayButton({ planId, planName, amount, orgId, userEm
       // 3. Open checkout
       const rzp = new window.Razorpay({
         key,
-        amount,
         currency: 'INR',
         name: 'Clausr',
         description: `${planName} Plan`,
-        order_id: orderId,
+        subscription_id: subscriptionId,
         prefill: { name: userName, email: userEmail },
         theme: { color: '#185FA5' },
-        handler: async function(response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) {
+        handler: async function(response: RazorpaySuccessResponse) {
           // 4. Verify payment
-          await fetch('/api/billing/verify', {
+          const verifyRes = await fetch('/api/billing/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              planId, orgId,
+              planId,
+              orgId,
               paymentId: response.razorpay_payment_id,
-              orderId: response.razorpay_order_id,
+              subscriptionId: response.razorpay_subscription_id,
               signature: response.razorpay_signature,
             }),
           })
+
+          if (!verifyRes.ok) {
+            const verifyPayload = await verifyRes.json().catch(() => ({}))
+            throw new Error(verifyPayload.error || 'Payment verification failed')
+          }
+
           router.refresh()
           router.push('/dashboard')
         },

@@ -2,20 +2,31 @@ import { NextResponse } from 'next/server'
 import Razorpay from 'razorpay'
 import { createServiceClient } from '@/lib/supabase/server'
 import { getUserRole } from '@/lib/permissions'
+import { isPaidPlan, getPlanLimit, getRazorpayPlanId } from '@/lib/billing'
 
 export async function POST(req: Request) {
   try {
-    const { amount, planId, orgId } = await req.json()
+    const { planId, orgId } = await req.json() as { planId?: string; orgId?: string }
     const supabase = createServiceClient()
 
-    // Log keys presence (without values)
-    console.log('Razorpay keys present:', {
-      key_id: !!process.env.RAZORPAY_KEY_ID,
-      key_secret: !!process.env.RAZORPAY_KEY_SECRET,
-    })
+    if (!orgId || !planId) {
+      return NextResponse.json({ error: 'Missing orgId or planId' }, { status: 400 })
+    }
+
+    if (!isPaidPlan(planId)) {
+      return NextResponse.json({ error: 'Invalid paid plan' }, { status: 400 })
+    }
 
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
       return NextResponse.json({ error: 'Missing Razorpay env vars' }, { status: 500 })
+    }
+
+    const razorpayPlanId = getRazorpayPlanId(planId)
+    if (!razorpayPlanId) {
+      return NextResponse.json(
+        { error: `Missing Razorpay plan mapping for ${planId}` },
+        { status: 500 }
+      )
     }
 
     const razorpay = new Razorpay({
@@ -38,25 +49,52 @@ export async function POST(req: Request) {
       )
     }
 
-    const order = await razorpay.orders.create({
-      amount,
-      currency: 'INR',
-      receipt: `clausr_${orgId}_${planId}`.slice(0, 40),
+    const { data: org } = await supabase
+      .from('organisations')
+      .select('razorpay_subscription_id, subscription_status')
+      .eq('id', orgId)
+      .single()
+
+    if (org?.razorpay_subscription_id && ['active', 'authenticated'].includes(org.subscription_status || '')) {
+      return NextResponse.json(
+        { error: 'An active subscription already exists for this organization.' },
+        { status: 409 }
+      )
+    }
+
+    const subscription = await razorpay.subscriptions.create({
+      plan_id: razorpayPlanId,
+      customer_notify: 1,
+      quantity: 1,
+      total_count: 1200,
       notes: { orgId, planId },
     }).catch((error) => {
-      console.error('Razorpay create order failed:', error)
-      throw new Error(`Razorpay: ${error.description || error.message || 'Failed to create order'}`)
+      console.error('Razorpay create subscription failed:', error)
+      throw new Error(`Razorpay: ${error.description || error.message || 'Failed to create subscription'}`)
     })
+
+    await supabase
+      .from('organisations')
+      .update({
+        razorpay_subscription_id: subscription.id,
+        subscription_status: subscription.status || 'created',
+      })
+      .eq('id', orgId)
 
     // Log the activity
     await supabase.from('activity_log').insert({
       org_id: orgId,
       user_id: user.id,
-      action: `Initiated payment for plan ${planId}`,
+      action: `Created ${planId} subscription`,
+      details: {
+        subscription_id: subscription.id,
+        status: subscription.status || 'created',
+        plan_limit: getPlanLimit(planId),
+      },
     })
 
     return NextResponse.json({
-      orderId: order.id,
+      subscriptionId: subscription.id,
       key: process.env.RAZORPAY_KEY_ID,
     })
   } catch (err: unknown) {

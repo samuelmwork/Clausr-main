@@ -174,10 +174,31 @@ The schema SQL schedules the cron job, but you need to set two config variables:
    ```
    RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
    RAZORPAY_KEY_SECRET=your_secret_here
-   RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
+   RAZORPAY_WEBHOOK_SECRET=your_webhook_secret_here
+   RAZORPAY_PLAN_ID_STARTER=plan_xxxxxxxxxxxx
+   RAZORPAY_PLAN_ID_PRO=plan_xxxxxxxxxxxx
+   RAZORPAY_PLAN_ID_TEAM=plan_xxxxxxxxxxxx
    ```
 
-### 3.3 Test payment credentials
+### 3.3 Create recurring plans + webhook
+
+1. In Razorpay dashboard, create monthly plans for Starter/Pro/Team.
+2. Copy each `plan_...` id to:
+   - `RAZORPAY_PLAN_ID_STARTER`
+   - `RAZORPAY_PLAN_ID_PRO`
+   - `RAZORPAY_PLAN_ID_TEAM`
+3. Add webhook endpoint:
+   - URL: `https://www.yourdomain.com/api/billing/webhook`
+   - Secret: same value as `RAZORPAY_WEBHOOK_SECRET`
+4. Enable at least these events:
+   - `subscription.authenticated`
+   - `subscription.activated`
+   - `subscription.charged`
+   - `subscription.cancelled`
+   - `subscription.completed`
+   - `subscription.halted`
+
+### 3.4 Test payment credentials
 
 In test mode, use these card details on the checkout:
 - Card: `4111 1111 1111 1111`
@@ -185,7 +206,7 @@ In test mode, use these card details on the checkout:
 - CVV: Any 3 digits
 - OTP: `1234`
 
-### 3.4 Switch to live mode (when ready)
+### 3.5 Switch to live mode (when ready)
 
 1. Complete KYC in Razorpay dashboard
 2. Go to **Settings → API Keys → Live Mode**
@@ -223,7 +244,10 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 # Razorpay
 RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
 RAZORPAY_KEY_SECRET=xxxxxxxxxxxx
-RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
+RAZORPAY_WEBHOOK_SECRET=xxxxxxxxxxxx
+RAZORPAY_PLAN_ID_STARTER=plan_xxxxxxxxxxxx
+RAZORPAY_PLAN_ID_PRO=plan_xxxxxxxxxxxx
+RAZORPAY_PLAN_ID_TEAM=plan_xxxxxxxxxxxx
 
 # Resend
 RESEND_API_KEY=re_xxxxxxxxxxxx
