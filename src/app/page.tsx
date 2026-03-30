@@ -96,7 +96,7 @@ export default function LandingPage() {
             {[
               { name: 'Free', price: '₹0', period: 'forever', features: ['5 contracts', '1 user', 'Email alerts', 'Calendar view'], cta: 'Start free', highlight: false },
               { name: 'Starter', price: '₹999', period: '/month', features: ['25 contracts', '2 users', 'File uploads', 'Smart alerts', 'Dashboard + overall spend'], cta: 'Start Starter', highlight: true },
-              { name: 'Pro', price: '₹2,999', period: '/month', features: ['Unlimited contracts', '5 users', 'WhatsApp renewal alerts', 'CSV import', 'Activity log'], cta: 'Start Pro', highlight: false },
+              { name: 'Pro', price: '₹1,999', period: '/month', features: ['Unlimited contracts', '5 users', 'WhatsApp renewal alerts', 'CSV import', 'Activity log'], cta: 'Start Pro', highlight: false },
             ].map(p => (
               <div key={p.name} className={`rounded-xl p-6 ${p.highlight ? 'bg-brand text-white' : 'bg-surface border border-border'}`}>
                 <div className={`text-sm font-semibold mb-1 ${p.highlight ? 'text-blue-200' : 'text-muted'}`}>{p.name}</div>
@@ -121,8 +121,14 @@ export default function LandingPage() {
       <footer className="border-t border-border py-8">
         <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-navy rounded flex items-center justify-center">
-              <span className="text-white text-xs font-bold">C</span>
+            <div className="w-7 h-7 rounded-md border border-border bg-surface shadow-sm flex items-center justify-center overflow-hidden">
+              <Image
+                src="/Logo.png"
+                alt="Clausr logo"
+                width={28}
+                height={28}
+                className="w-full h-full object-contain"
+              />
             </div>
             <span className="font-semibold text-navy">Clausr</span>
             <span className="text-muted text-sm">· India-first vendor contract intelligence</span>
