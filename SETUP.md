@@ -174,7 +174,7 @@ The schema SQL schedules the cron job, but you need to set two config variables:
    ```
    RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
    RAZORPAY_KEY_SECRET=your_secret_here
-   NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
+   RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
    ```
 
 ### 3.3 Test payment credentials
@@ -223,13 +223,13 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 # Razorpay
 RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
 RAZORPAY_KEY_SECRET=xxxxxxxxxxxx
-NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
+RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
 
 # Resend
 RESEND_API_KEY=re_xxxxxxxxxxxx
 
 # App
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+APP_URL=http://localhost:3000
 CRON_SECRET=your_random_cron_secret
 ```
 
@@ -282,9 +282,9 @@ git push -u origin main
 | `SUPABASE_SERVICE_ROLE_KEY` | your service role key |
 | `RAZORPAY_KEY_ID` | rzp_test_... |
 | `RAZORPAY_KEY_SECRET` | your secret |
-| `NEXT_PUBLIC_RAZORPAY_KEY_ID` | rzp_test_... |
+| `RAZORPAY_KEY_ID` | rzp_test_... |
 | `RESEND_API_KEY` | re_... |
-| `NEXT_PUBLIC_APP_URL` | https://your-app.vercel.app |
+| `APP_URL` | https://your-app.vercel.app |
 | `CRON_SECRET` | your cron secret |
 
 6. Click **"Deploy"**
@@ -363,7 +363,7 @@ Run through this checklist after deploying:
 ### 7.3 Update all URLs
 
 After adding your custom domain:
-1. Update `NEXT_PUBLIC_APP_URL` in Vercel env vars to `https://clausr.in`
+1. Update `APP_URL` in Vercel env vars to `https://clausr.in`
 2. Update Supabase redirect URLs to include `https://clausr.in/auth/callback`
 3. Update Supabase `app.api_url` to `https://clausr.in`
 4. Redeploy Vercel (push any commit or trigger manual redeploy)

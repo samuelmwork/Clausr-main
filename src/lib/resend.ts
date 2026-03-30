@@ -80,7 +80,7 @@ export async function sendInviteEmail(data: InviteEmailData) {
 }
 
 export async function sendAlertEmail(data: AlertEmailData) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL
+  const appUrl = process.env.APP_URL || 'http://localhost:3000'
   const urgency = data.daysLeft <= 7 ? '🔴' : data.daysLeft <= 30 ? '🟡' : '🟢'
   const valueFormatted = new Intl.NumberFormat('en-IN', {
     style: 'currency', currency: data.currency, maximumFractionDigits: 0,

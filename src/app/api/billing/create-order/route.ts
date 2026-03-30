@@ -57,7 +57,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       orderId: order.id,
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      key: process.env.RAZORPAY_KEY_ID,
     })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'
