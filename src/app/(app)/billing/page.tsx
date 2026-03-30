@@ -25,8 +25,8 @@ const PLANS = [
   {
     id: 'starter', 
     name: 'STARTER', 
-    price: 99900, 
-    priceLabel: '₹999 / month', 
+    price: 100,
+    priceLabel: '₹1 / month (test)', 
     period: '',
     description: 'For founders who want control without chaos.',
     features: [
@@ -41,8 +41,8 @@ const PLANS = [
   {
     id: 'pro', 
     name: 'PRO', 
-    price: 299900, 
-    priceLabel: '₹2,999 / month', 
+    price: 100,
+    priceLabel: '₹1 / month (test)', 
     period: '',
     description: 'For growing teams managing contracts together.',
     features: [
