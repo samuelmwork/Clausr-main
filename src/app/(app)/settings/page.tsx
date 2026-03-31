@@ -298,10 +298,14 @@ export default function SettingsPage() {
         )}
 
         {(() => {
-          const PLAN_LIMITS = { free: 1, starter: 2, pro: 5 } as const
+          const PLAN_LIMITS = { free: 1, test: 2, starter: 2, pro: 5 } as const
           const teamLimit = PLAN_LIMITS[currentPlan as keyof typeof PLAN_LIMITS] || Infinity
           const isLimitReached = members.length >= teamLimit
-          const nextPlan = currentPlan === 'free' ? 'starter' : currentPlan === 'starter' ? 'pro' : null
+          const nextPlan = currentPlan === 'free'
+            ? 'starter'
+            : currentPlan === 'starter' || currentPlan === 'test'
+            ? 'pro'
+            : null
           
           if (isLimitReached) {
             return (

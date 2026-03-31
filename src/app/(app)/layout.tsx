@@ -16,6 +16,7 @@ const navItems = [
 
 const planConfig: Record<string, { bg: string; text: string }> = {
   free: { bg: 'bg-brand-light', text: 'text-brand' },
+  test: { bg: 'bg-emerald-100', text: 'text-emerald-700' },
   starter: { bg: 'bg-brand', text: 'text-white' },
   pro: { bg: 'bg-navy', text: 'text-blue-300 border border-brand/40' },
   team: { bg: 'bg-amber-900/30', text: 'text-amber-300' },

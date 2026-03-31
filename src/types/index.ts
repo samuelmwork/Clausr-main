@@ -1,4 +1,4 @@
-export type Plan = 'free' | 'starter' | 'pro' | 'team'
+export type Plan = 'free' | 'test' | 'starter' | 'pro' | 'team'
 export type ContractType = 'saas' | 'services' | 'lease' | 'nda' | 'employment' | 'other'
 export type ContractStatus = 'active' | 'expiring' | 'expired' | 'cancelled' | 'renewed'
 export type MemberRole = 'admin' | 'editor' | 'viewer'
@@ -86,13 +86,15 @@ export interface DashboardStats {
 
 export const PLAN_LIMITS: Record<Plan, number> = {
   free: 5,
+  test: 25,
   starter: 25,
   pro: 999,
   team: 9999,
 }
 
 export const PLAN_PRICES: Record<string, { amount: number; label: string }> = {
+  test:    { amount: 100, label: '₹1/month' },
   starter: { amount: 99900, label: '₹999/month' },
-  pro:     { amount: 299900, label: '₹2,999/month' },
+  pro:     { amount: 199900, label: '₹1,999/month' },
   team:    { amount: 699900, label: '₹6,999/month' },
 }

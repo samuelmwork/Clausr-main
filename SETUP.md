@@ -175,6 +175,7 @@ The schema SQL schedules the cron job, but you need to set two config variables:
    RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
    RAZORPAY_KEY_SECRET=your_secret_here
    RAZORPAY_WEBHOOK_SECRET=your_webhook_secret_here
+   RAZORPAY_PLAN_ID_TEST=plan_xxxxxxxxxxxx
    RAZORPAY_PLAN_ID_STARTER=plan_xxxxxxxxxxxx
    RAZORPAY_PLAN_ID_PRO=plan_xxxxxxxxxxxx
    RAZORPAY_PLAN_ID_TEAM=plan_xxxxxxxxxxxx
@@ -184,6 +185,7 @@ The schema SQL schedules the cron job, but you need to set two config variables:
 
 1. In Razorpay dashboard, create monthly plans for Starter/Pro/Team.
 2. Copy each `plan_...` id to:
+   - `RAZORPAY_PLAN_ID_TEST`
    - `RAZORPAY_PLAN_ID_STARTER`
    - `RAZORPAY_PLAN_ID_PRO`
    - `RAZORPAY_PLAN_ID_TEAM`
@@ -245,6 +247,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
 RAZORPAY_KEY_SECRET=xxxxxxxxxxxx
 RAZORPAY_WEBHOOK_SECRET=xxxxxxxxxxxx
+RAZORPAY_PLAN_ID_TEST=plan_xxxxxxxxxxxx
 RAZORPAY_PLAN_ID_STARTER=plan_xxxxxxxxxxxx
 RAZORPAY_PLAN_ID_PRO=plan_xxxxxxxxxxxx
 RAZORPAY_PLAN_ID_TEAM=plan_xxxxxxxxxxxx

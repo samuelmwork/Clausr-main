@@ -18,7 +18,14 @@ export async function POST(req: Request) {
     }
 
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-      return NextResponse.json({ error: 'Missing Razorpay env vars' }, { status: 500 })
+      return NextResponse.json({ error: 'Missing Razorpay API env vars' }, { status: 500 })
+    }
+
+    if (!process.env.RAZORPAY_WEBHOOK_SECRET) {
+      return NextResponse.json(
+        { error: 'Missing RAZORPAY_WEBHOOK_SECRET. Configure webhook secret before creating subscriptions.' },
+        { status: 500 }
+      )
     }
 
     const razorpayPlanId = getRazorpayPlanId(planId)
