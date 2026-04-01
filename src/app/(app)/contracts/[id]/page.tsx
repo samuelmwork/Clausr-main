@@ -23,11 +23,15 @@ export default async function ContractDetailPage({ params, searchParams }: {
   }
   if (!contract) notFound()
 
-  const { data: members } = await supabase
-    .from('members').select('org_id, role, organisations!inner(plan)').eq('user_id', user.id).order('created_at', { ascending: false })
-  const member = members?.[0]
-  if (!member || member.org_id !== contract.org_id) notFound()
-  
+  const { data: member } = await supabase
+    .from('members')
+    .select('org_id, role, organisations!inner(plan)')
+    .eq('user_id', user.id)
+    .eq('org_id', contract.org_id)
+    .single()
+
+  if (!member) notFound()
+
   const org = (member as { organisations?: { plan?: string } }).organisations
   const plan = org?.plan || 'free'
   const isPaidPlan = plan !== 'free'
