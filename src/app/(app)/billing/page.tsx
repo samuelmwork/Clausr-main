@@ -23,21 +23,6 @@ const PLANS = [
     highlight: false,
   },
   {
-    id: 'test',
-    name: 'TEST',
-    priceLabel: '₹1 / month',
-    period: '',
-    description: 'For payment testing with a live checkout flow at a minimal amount.',
-    features: [
-      { text: '2 Users', live: true },
-      { text: 'Up to 25 contracts', live: true },
-      { text: 'Razorpay subscription checkout', live: true },
-      { text: 'Webhook + signature verification', live: true },
-      { text: 'Same billing flow as paid plans', live: true },
-    ],
-    highlight: false,
-  },
-  {
     id: 'starter', 
     name: 'STARTER', 
     priceLabel: '₹999 / month', 

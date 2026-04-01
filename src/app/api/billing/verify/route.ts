@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import crypto from 'crypto'
-import { createServiceClient } from '@/lib/supabase/server'
-import { getUserRole } from '@/lib/permissions'
+import { createAdminClient } from '@/lib/supabase/server'
 import { isPaidPlan, getPlanLimit } from '@/lib/billing'
 
 export async function POST(req: Request) {
@@ -36,21 +35,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
     }
 
-    const supabase = await createServiceClient()
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const userRole = await getUserRole(supabase, orgId)
-    if (!['admin', 'editor'].includes(userRole || '')) {
-      return NextResponse.json(
-        { error: 'Only admins or editors can manage billing' },
-        { status: 403 }
-      )
-    }
-
+    const supabase = createAdminClient()
     const limit = getPlanLimit(planId)
+
     await supabase
       .from('organisations')
       .update({
@@ -63,7 +50,6 @@ export async function POST(req: Request) {
 
     await supabase.from('activity_log').insert({
       org_id: orgId,
-      user_id: user.id,
       action: `Activated ${planId} subscription`,
       details: {
         payment_id: paymentId,
