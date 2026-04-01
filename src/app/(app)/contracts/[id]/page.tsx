@@ -22,7 +22,7 @@ export default async function ContractDetailPage({ params, searchParams }: {
   const { data: contract, error: contractError } = await supabase
     .from('contracts')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', resolvedParams.id)
     .single()
   if (contractError) {
     console.error('Contract detail query error:', contractError)
@@ -45,7 +45,7 @@ export default async function ContractDetailPage({ params, searchParams }: {
   const { data: activity, error: activityError } = await supabase
     .from('activity_log')
     .select('*')
-    .eq('contract_id', params.id)
+    .eq('contract_id', resolvedParams.id)
     .order('created_at', { ascending: false })
     .limit(10)
   if (activityError) {
