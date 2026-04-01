@@ -6,15 +6,16 @@ import ContractActions from './ContractActions'
 import { FileText } from 'lucide-react'
 
 export default async function ContractDetailPage({ params, searchParams }: {
-  params: { id: string }
+  params: { id: string } | Promise<{ id: string }>
   searchParams: { action?: string }
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  if (!params?.id || params.id === 'undefined') {
-    console.error('Invalid contract id param:', params)
+  const resolvedParams = await params
+  if (!resolvedParams?.id || resolvedParams.id === 'undefined') {
+    console.error('Invalid contract id param:', resolvedParams)
     notFound()
   }
 
