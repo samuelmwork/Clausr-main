@@ -40,6 +40,12 @@ export default function EditContractPage({ params }: { params: { id: string } })
   }, [])
 
   useEffect(() => {
+    if (!params?.id || params.id === 'undefined') {
+      setError('Invalid contract id')
+      setFetching(false)
+      return
+    }
+
     supabase.from('contracts').select('*').eq('id', params.id).single()
       .then(({ data }) => {
         if (data) setForm({

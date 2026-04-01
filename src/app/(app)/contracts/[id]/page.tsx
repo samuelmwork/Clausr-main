@@ -13,6 +13,11 @@ export default async function ContractDetailPage({ params, searchParams }: {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
+  if (!params?.id || params.id === 'undefined') {
+    console.error('Invalid contract id param:', params)
+    notFound()
+  }
+
   const { data: contract, error: contractError } = await supabase
     .from('contracts')
     .select('*')
