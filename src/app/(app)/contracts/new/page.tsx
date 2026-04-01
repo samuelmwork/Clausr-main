@@ -89,10 +89,20 @@ export default function NewContractPage() {
         file_url: fileUrl || null,
         file_name: fileName || null,
       })
-      if (insertErr) throw insertErr
+      if (insertErr) {
+        const message = insertErr.message || 'Something went wrong'
+        if (message.includes('Contract limit reached')) {
+          setError('Your plan limit is full. Upgrade to add more contracts.')
+        } else {
+          setError(message)
+        }
+        setLoading(false)
+        return
+      }
       router.push('/contracts')
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      const message = err instanceof Error ? err.message : (typeof err === 'object' && err !== null && 'message' in err ? String((err as any).message) : 'Something went wrong')
+      setError(message || 'Something went wrong')
       setLoading(false)
     }
   }
