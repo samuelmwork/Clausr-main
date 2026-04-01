@@ -1,5 +1,5 @@
 'use client'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 
 interface Toast {
   id: string
@@ -22,7 +22,10 @@ export function Toaster() {
     setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3500)
   }, [])
 
-  toastFn = addToast
+  useEffect(() => {
+    toastFn = addToast
+    return () => { toastFn = null }
+  }, [addToast])
 
   const colors: Record<Toast['type'], string> = {
     success: 'bg-active-text text-white',
