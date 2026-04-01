@@ -49,6 +49,28 @@ function SignupForm() {
       return
     }
 
+    if (!invitation) {
+      const orgName = String(form.orgName || '').trim()
+      if (!orgName) {
+        setError('Please enter your company name')
+        setLoading(false)
+        return
+      }
+
+      const checkRes = await fetch('/api/org/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orgName }),
+      })
+
+      if (!checkRes.ok) {
+        const body = await checkRes.json().catch(() => ({}))
+        setError(body?.error || 'Organization already exists')
+        setLoading(false)
+        return
+      }
+    }
+
     if (invitation && normalizedEmail !== String(invitation.email || '').trim().toLowerCase() && process.env.NODE_ENV !== 'development') {
       setError('Email must match the invitation')
       setLoading(false)
@@ -86,9 +108,24 @@ function SignupForm() {
   }
 
   async function handleGoogle() {
-    if (!invitation && !form.orgName.trim()) {
-      setError('Please enter your company name before continuing with Google')
-      return
+    if (!invitation) {
+      const orgName = String(form.orgName || '').trim()
+      if (!orgName) {
+        setError('Please enter your company name before continuing with Google')
+        return
+      }
+
+      const checkRes = await fetch('/api/org/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orgName }),
+      })
+
+      if (!checkRes.ok) {
+        const body = await checkRes.json().catch(() => ({}))
+        setError(body?.error || 'Organization already exists')
+        return
+      }
     }
 
     const params = new URLSearchParams()
