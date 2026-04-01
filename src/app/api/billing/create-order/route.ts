@@ -81,7 +81,7 @@ export async function POST(req: Request) {
       plan_id: razorpayPlanId,
       customer_notify: 1,
       quantity: 1,
-      total_count: 999,
+      total_count: 360, // keep total duration within 30 years for UPI authorizations
       notes: { orgId, planId },
     }).catch((error) => {
       console.error('Razorpay create subscription failed:', error)
