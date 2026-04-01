@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const inviteToken = searchParams.get('invite')
   const queryOrgName = searchParams.get('orgName')?.trim() || ''
   if (code) {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.exchangeCodeForSession(code)
     if (user) {
       const metadataOrgName =

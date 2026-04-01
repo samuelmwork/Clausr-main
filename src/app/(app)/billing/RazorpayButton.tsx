@@ -89,7 +89,8 @@ export default function RazorpayButton({ planId, planName, orgId, userEmail, use
       rzp.open()
     } catch (err) {
       console.error('Payment error:', err)
-      alert('Payment failed. Please try again.')
+      const message = err instanceof Error ? err.message : 'Payment failed. Please try again.'
+      alert(message)
     }
     setLoading(false)
   }

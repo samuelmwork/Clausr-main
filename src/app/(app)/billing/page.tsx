@@ -72,7 +72,7 @@ const PLANS = [
 ]
 
 export default async function BillingPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 

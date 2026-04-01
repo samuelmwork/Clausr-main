@@ -8,7 +8,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Missing orgId' }, { status: 400 })
   }
 
-  const supabase = createServiceClient()
+  const supabase = await createServiceClient()
 
   // Get members in organization
   const { data: members, error: membersError } = await supabase

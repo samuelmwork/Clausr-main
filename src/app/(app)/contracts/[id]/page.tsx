@@ -9,7 +9,7 @@ export default async function ContractDetailPage({ params, searchParams }: {
   params: { id: string }
   searchParams: { action?: string }
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 

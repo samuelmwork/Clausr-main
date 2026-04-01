@@ -9,7 +9,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Token required' }, { status: 400 })
   }
 
-  const supabase = createServiceClient()
+  const supabase = await createServiceClient()
 
   const { data, error } = await supabase
     .from('invitations')

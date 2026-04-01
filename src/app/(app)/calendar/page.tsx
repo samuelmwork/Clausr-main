@@ -10,7 +10,7 @@ export default async function CalendarPage({
 }: {
   searchParams: { month?: string }
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 

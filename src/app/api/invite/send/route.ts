@@ -6,7 +6,7 @@ import { getUserRole } from '@/lib/permissions'
 export async function POST(req: Request) {
   try {
     const { orgId, email, role, inviterName, orgName } = await req.json()
-    const supabase = createServiceClient()
+    const supabase = await createServiceClient()
 
     // Get the current user to verify they're an admin
     const { data: { user }, error: userError } = await supabase.auth.getUser()

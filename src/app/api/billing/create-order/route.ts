@@ -7,7 +7,7 @@ import { isPaidPlan, getPlanLimit, getRazorpayPlanId } from '@/lib/billing'
 export async function POST(req: Request) {
   try {
     const { planId, orgId } = await req.json() as { planId?: string; orgId?: string }
-    const supabase = createServiceClient()
+    const supabase = await createServiceClient()
 
     if (!orgId || !planId) {
       return NextResponse.json({ error: 'Missing orgId or planId' }, { status: 400 })
@@ -62,9 +62,17 @@ export async function POST(req: Request) {
       .eq('id', orgId)
       .single()
 
-    if (org?.razorpay_subscription_id && ['active', 'authenticated'].includes(org.subscription_status || '')) {
+    if (!org) {
+      return NextResponse.json({ error: 'Organization not found' }, { status: 404 })
+    }
+
+    if (org.razorpay_subscription_id && ['active', 'authenticated'].includes(org.subscription_status || '')) {
       return NextResponse.json(
-        { error: 'An active subscription already exists for this organization.' },
+        {
+          error: 'An active subscription already exists for this organization. Cancel it first before creating a new one.',
+          code: 'SUBSCRIPTION_ALREADY_ACTIVE',
+          subscriptionStatus: org.subscription_status || 'unknown',
+        },
         { status: 409 }
       )
     }
@@ -73,7 +81,7 @@ export async function POST(req: Request) {
       plan_id: razorpayPlanId,
       customer_notify: 1,
       quantity: 1,
-      total_count: 1200,
+      total_count: 999,
       notes: { orgId, planId },
     }).catch((error) => {
       console.error('Razorpay create subscription failed:', error)
