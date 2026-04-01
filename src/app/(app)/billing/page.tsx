@@ -211,7 +211,7 @@ export default async function BillingPage() {
 
       <p className="text-sm text-muted text-center mt-2">
         Payments are processed securely via Razorpay. No card details stored on our servers.
-        Cancel anytime by emailing <a href="mailto:support@clausr.com" className="text-brand hover:underline">support@clausr.com</a>
+        Cancel anytime by emailing <a href="mailto:support.clausr@gmail.com" className="text-brand hover:underline">support.clausr@gmail.com</a>
       </p>
     </div>
   )
