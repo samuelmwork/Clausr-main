@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -16,7 +16,7 @@ const CONTRACT_TYPES = [
 
 export default function EditContractPage({ params }: { params: { id: string } }) {
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState('')
@@ -28,6 +28,7 @@ export default function EditContractPage({ params }: { params: { id: string } })
   })
 
   const isPaidPlan = plan !== 'free'
+  const invalidId = !params?.id || params.id === 'undefined'
 
   useEffect(() => {
     supabase.from('members').select('org_id, organisations!inner(plan)')
@@ -37,14 +38,10 @@ export default function EditContractPage({ params }: { params: { id: string } })
           setPlan(org?.plan || 'free')
         }
       })
-  }, [])
+  }, [supabase])
 
   useEffect(() => {
-    if (!params?.id || params.id === 'undefined') {
-      setError('Invalid contract id')
-      setFetching(false)
-      return
-    }
+    if (invalidId) return
 
     supabase.from('contracts').select('*').eq('id', params.id).single()
       .then(({ data }) => {
@@ -61,10 +58,18 @@ export default function EditContractPage({ params }: { params: { id: string } })
         })
         setFetching(false)
       })
-  }, [params.id])
+  }, [invalidId, params.id, supabase])
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
+
+  if (invalidId) {
+    return (
+      <div className="p-6 max-w-5xl mx-auto text-sm text-red-600">
+        Invalid contract id
+      </div>
+    )
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

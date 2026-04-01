@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -16,7 +16,7 @@ const CONTRACT_TYPES = [
 
 export default function NewContractPage() {
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [uploading, setUploading] = useState(false)
@@ -36,7 +36,7 @@ export default function NewContractPage() {
         }
         setFetchingPlan(false)
       })
-  }, [])
+  }, [supabase])
 
   const [form, setForm] = useState({
     vendor_name: '', contract_type: 'saas', value_annual: '',
