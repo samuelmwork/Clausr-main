@@ -41,28 +41,30 @@ export async function POST(req: Request) {
     // Send alert to all teammates in org (admin/editor/viewer)
     const { data: orgMembers = [], error: membersErr } = await supabase
       .from('members')
-      .select('user_id, email, role, profiles(email)')
+      .select('user_id, role')
       .eq('org_id', contract.org_id)
       .in('role', ['admin', 'editor', 'viewer'])
 
     if (membersErr || !orgMembers?.length) continue
 
-    const userIds = orgMembers.map(m => m.user_id).filter(Boolean)
     const memberEmailMap = new Map<string, string>()
+    const missingUserIds: string[] = []
+
     for (const member of orgMembers) {
-      const email =
-        member.email ||
-        (member as { profiles?: { email?: string } })?.profiles?.email ||
-        ''
-      if (email && member.user_id) memberEmailMap.set(member.user_id, email)
+      const email = (member as { profiles?: { email?: string } })?.profiles?.email || ''
+      if (email && member.user_id) {
+        memberEmailMap.set(member.user_id, email)
+      } else if (member.user_id) {
+        missingUserIds.push(member.user_id)
+      }
     }
 
-    // Fallback to auth users for any missing member email
-    const missingUserIds = userIds.filter(id => !memberEmailMap.has(id))
     for (const userId of missingUserIds) {
       const { data } = await supabase.auth.admin.getUserById(userId)
       const email = data?.user?.email || ''
-      if (email) memberEmailMap.set(userId, email)
+      if (email) {
+        memberEmailMap.set(userId, email)
+      }
     }
 
     const recipientEmails = Array.from(new Set(Array.from(memberEmailMap.values()).filter(Boolean)))

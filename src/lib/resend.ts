@@ -151,7 +151,7 @@ export async function sendAlertEmail(data: AlertEmailData) {
       to: process.env.NODE_ENV === 'development' 
         ? ['samuelm99729@gmail.com']
         : recipients,
-      subject: `${process.env.NODE_ENV === 'development' ? '[TEST] ' : ''}${urgency} ${data.vendorName} contract ${data.daysLeft <= 0 ? 'has expired' : `renews in ${data.daysLeft} days`} — ${valueFormatted}/yr`,
+      subject: `${urgency} ${data.vendorName} contract ${data.daysLeft <= 0 ? 'has expired' : `renews in ${data.daysLeft} days`} — ${valueFormatted}/yr`,
       html,
     }),
   })
