@@ -7,7 +7,7 @@ import { FileText } from 'lucide-react'
 
 export default async function ContractDetailPage({ params, searchParams }: {
   params: { id: string } | Promise<{ id: string }>
-  searchParams: { action?: string }
+  searchParams: { action?: string } | Promise<{ action?: string }>
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -41,6 +41,7 @@ export default async function ContractDetailPage({ params, searchParams }: {
   const org = (member as { organisations?: { plan?: string } }).organisations
   const plan = org?.plan || 'free'
   const isPaidPlan = plan !== 'free'
+  const resolvedSearchParams = await searchParams
 
   const { data: activity, error: activityError } = await supabase
     .from('activity_log')
@@ -54,8 +55,13 @@ export default async function ContractDetailPage({ params, searchParams }: {
 
   const days = daysUntil(contract.end_date)
   const canEdit = member.role === 'admin' || member.role === 'editor'
+  const statusLabel = contract.status === 'renewed' ? 'Renewed' : urgencyLabel(days)
+  const statusColor = contract.status === 'renewed'
+    ? 'text-renewed-text bg-renewed-bg'
+    : urgencyColor(days)
 
   const infoRows = [
+    { label: 'Status', value: contract.status.charAt(0).toUpperCase() + contract.status.slice(1) },
     { label: 'Vendor', value: contract.vendor_name },
     { label: 'Type', value: contractTypeLabel(contract.contract_type) },
     { label: 'Annual value', value: contract.value_annual ? formatCurrency(contract.value_annual, contract.currency) : '—' },
@@ -64,6 +70,14 @@ export default async function ContractDetailPage({ params, searchParams }: {
     { label: 'Notice period', value: `${contract.notice_days} days` },
     { label: 'Auto-renews', value: contract.auto_renews ? 'Yes — action required' : 'No' },
   ]
+
+  let fileHref = contract.file_url
+  if (fileHref) {
+    const match = fileHref.match(/\/public\/contracts\/(.+)$/)
+    const path = match ? match[1] : fileHref
+    const { data: signed } = await supabase.storage.from('contracts').createSignedUrl(path, 60 * 60)
+    if (signed?.signedUrl) fileHref = signed.signedUrl
+  }
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -82,7 +96,7 @@ export default async function ContractDetailPage({ params, searchParams }: {
                 <div className="flex items-center gap-2 mt-1.5">
                   <span className="text-xs bg-gray-100 text-slate-600 px-2 py-1 rounded-full">{contractTypeLabel(contract.contract_type)}</span>
                   {contract.auto_renews && <span className="text-xs bg-expiring-bg text-expiring-text px-2 py-1 rounded-full">Auto-renews</span>}
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${urgencyColor(days)}`}>{urgencyLabel(days)}</span>
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusColor}`}>{statusLabel}</span>
                 </div>
               </div>
               {canEdit && (
@@ -111,7 +125,7 @@ export default async function ContractDetailPage({ params, searchParams }: {
 
             {isPaidPlan && contract.file_url && (
               <div className="mt-4 pt-4 border-t border-border">
-                <a href={contract.file_url} target="_blank" rel="noopener noreferrer"
+                <a href={fileHref} target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-brand hover:underline">
                   <FileText className="w-4 h-4" /> {contract.file_name || 'View contract PDF'}
                 </a>
@@ -146,7 +160,7 @@ export default async function ContractDetailPage({ params, searchParams }: {
               contractId={contract.id}
               status={contract.status}
               orgId={contract.org_id}
-              defaultAction={searchParams.action}
+              defaultAction={resolvedSearchParams?.action}
             />
           )}
 
