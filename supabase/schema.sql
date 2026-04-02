@@ -261,13 +261,17 @@ where p.id = u.id
 create or replace function public.update_contract_status()
 returns trigger language plpgsql as $$
 begin
-  if new.end_date < current_date then
+  if new.status in ('cancelled','renewed') then
+    new.updated_at = now();
+    return new;
+  elsif new.end_date < current_date then
     new.status = 'expired';
   elsif new.end_date <= current_date + interval '30 days' then
     new.status = 'expiring';
-  elsif new.status not in ('cancelled','renewed') then
+  else
     new.status = 'active';
   end if;
+
   new.updated_at = now();
   return new;
 end;
@@ -290,19 +294,21 @@ begin
   where contract_id = new.id and sent = false;
 
   -- Create new alerts
-  foreach d in array alert_days loop
-    alert_date := new.end_date - (d || ' days')::interval;
-    if alert_date > current_date then
-      insert into public.alerts (contract_id, days_before, scheduled_for)
-      values (new.id, d, alert_date);
-    end if;
-  end loop;
+  if new.status not in ('cancelled', 'renewed') then
+    foreach d in array alert_days loop
+      alert_date := new.end_date - (d || ' days')::interval;
+      if alert_date > current_date then
+        insert into public.alerts (contract_id, days_before, scheduled_for)
+        values (new.id, d, alert_date);
+      end if;
+    end loop;
+  end if;
   return new;
 end;
 $$;
 
 create trigger after_contract_upsert
-  after insert or update of end_date on public.contracts
+  after insert or update of end_date, status on public.contracts
   for each row execute function public.create_contract_alerts();
 
 -- Check contract limit before insert
@@ -383,6 +389,7 @@ create index idx_contracts_end_date on public.contracts(end_date);
 create index idx_contracts_status on public.contracts(status);
 create index idx_members_user_id on public.members(user_id);
 create index idx_members_org_id on public.members(org_id);
+create unique index if not exists idx_organisations_name_unique on public.organisations(lower(name));
 create unique index if not exists idx_profiles_email_unique on public.profiles(lower(email)) where email is not null;
 create index idx_alerts_scheduled on public.alerts(scheduled_for) where sent = false;
 create index idx_activity_org_id on public.activity_log(org_id);

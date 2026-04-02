@@ -1,10 +1,12 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { use, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
-export default function InvitePage({ params }: { params: { token: string } }) {
+export default function InvitePage({ params }: { params: Promise<{ token: string }> }) {
+  const unwrappedParams = use(params)
+  const token = unwrappedParams.token
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [invitation, setInvitation] = useState<any>(null)
@@ -17,7 +19,7 @@ export default function InvitePage({ params }: { params: { token: string } }) {
         const { data, error } = await supabase
           .from('invitations')
           .select('*, organisations(name)')
-          .eq('token', params.token)
+          .eq('token', token)
           .maybeSingle()
 
         if (error) {
@@ -48,7 +50,7 @@ export default function InvitePage({ params }: { params: { token: string } }) {
     setLoading(true)
     setError('')
     loadInvitation()
-  }, [params.token, supabase])
+  }, [token, supabase])
 
   async function acceptInvitation() {
     setLoading(true)
@@ -56,19 +58,19 @@ export default function InvitePage({ params }: { params: { token: string } }) {
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-      router.push(`/auth/signup?invite=${params.token}`)
+      router.push(`/auth/signup?invite=${token}`)
       return
     }
 
     // Use the API route instead of direct Supabase calls
     try {
-      console.log('Accepting invitation with token:', params.token)
+      console.log('Accepting invitation with token:', token)
       const res = await fetch('/api/onboard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: user.id,
-          inviteToken: params.token,
+          inviteToken: token,
         }),
       })
 
