@@ -145,9 +145,7 @@ export async function sendAlertEmail(data: AlertEmailData) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: process.env.NODE_ENV === 'development' 
-        ? 'Clausr <onboarding@resend.dev>'
-        : 'Clausr Alerts <alerts@clausr.com>',
+      from: 'Clausr Alerts <alerts@mail.clausr.tech>',
       to: process.env.NODE_ENV === 'development' 
         ? ['samuelm99729@gmail.com']
         : recipients,
