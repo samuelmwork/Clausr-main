@@ -66,7 +66,7 @@ export async function sendInviteEmail(data: InviteEmailData) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Clausr <no-reply@mail.clausr.tech>',
+      from: 'Clausr <support.clausr@gmail.com>',
       to: toEmail,
       subject: `Join ${data.orgName} on Clausr`,
       html,
@@ -145,7 +145,7 @@ export async function sendAlertEmail(data: AlertEmailData) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Clausr Alerts <alerts@mail.clausr.tech>',
+      from: 'Clausr Alerts <support.clausr@gmail.com>',
       to: process.env.NODE_ENV === 'development' 
         ? ['samuelm99729@gmail.com']
         : recipients,
