@@ -53,7 +53,7 @@ export default function LandingPage() {
         <p className="text-xs text-muted mt-4">Free plan: 2 contracts forever. Upgrade anytime.</p>
       </section>
 
-      <section className="bg-navy py-14">
+      <section className="bg-midnight-light py-14">
         <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 text-center">
           {[
             { value: '₹0', label: 'Free plan forever' },
@@ -62,7 +62,7 @@ export default function LandingPage() {
           ].map(s => (
             <div key={s.label}>
               <div className="text-3xl font-bold text-white mb-1">{s.value}</div>
-              <div className="text-sm text-blue-300">{s.label}</div>
+              <div className="text-sm text-indigo-300">{s.label}</div>
             </div>
           ))}
         </div>
