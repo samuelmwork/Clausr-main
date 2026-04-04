@@ -3,53 +3,53 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import RazorpayButton from './RazorpayButton'
 import { Permissions, type Role } from '@/lib/permissions'
-import { CreditCard, Check } from 'lucide-react'
+import { CreditCard, Check, Sparkles, ShieldCheck } from 'lucide-react'
 
 const PLANS = [
   {
     id: 'free', 
-    name: 'FREE', 
+    name: 'Free', 
     price: 0, 
-    priceLabel: '₹0 / month', 
-    period: '',
-    description: 'Try it. No card. No risk.',
+    priceLabel: '₹0', 
+    period: '/ month',
+    description: 'Perfect for individuals starting out.',
     features: [
-      { text: '1 user', live: true },
+      { text: '1 User access', live: true },
       { text: 'Track up to 2 contracts', live: true },
       { text: 'Renewal email alerts (1 day)', live: true },
-      { text: 'Calendar view', live: true },
-      { text: 'Dashboard overview', live: true },
+      { text: 'Global calendar view', live: true },
+      { text: 'Basic dashboard stats', live: true },
     ],
     highlight: false,
   },
   {
     id: 'starter', 
-    name: 'STARTER', 
-    priceLabel: '₹399 / month', 
-    period: '',
-    description: 'For founders who want control without chaos.',
+    name: 'Starter', 
+    priceLabel: '₹399', 
+    period: '/ month',
+    description: 'For founders who need precision control.',
     features: [
-      { text: '2 Users', live: true },
+      { text: '2 User accounts', live: true },
       { text: 'Up to 10 contracts', live: true },
-      { text: 'Upload PDF / DOCX contracts', live: true },
-      { text: 'Smart renewal alerts (90/60/30/14/7/1 days)', live: true },
-      { text: 'Dashboard + overall spend', live: true },
+      { text: 'PDF / DOCX uploads', live: true },
+      { text: 'Smart multi-renewal alerts', live: true },
+      { text: 'Full financial overview', live: true },
     ],
     highlight: true,
   },
   {
     id: 'pro', 
-    name: 'PRO', 
-    priceLabel: '₹799 / month', 
-    period: '',
-    description: 'For growing teams managing contracts together.',
+    name: 'Pro', 
+    priceLabel: '₹799', 
+    period: '/ month',
+    description: 'For teams scaling their operations.',
     features: [
       { text: 'Up to 25 contracts', live: true },
       { text: 'Up to 5 team members', live: true },
-      { text: 'Shared workspace for ops + finance', live: true },
+      { text: 'Shared workspace + collab', live: true },
+      { text: 'Priority dashboard analysis', live: true },
       { text: 'Everything in Starter', live: true },
-      { text: 'CSV import', live: false },
-      { text: 'WhatsApp renewal alerts', live: false },
+      { text: 'WhatsApp alerts (beta)', live: false },
     ],
     highlight: false,
   },
@@ -72,17 +72,20 @@ export default async function BillingPage() {
   const canManageBilling = Permissions.canManageBilling(userRole)
   if (!canManageBilling) {
     return (
-      <div className="p-6 max-w-5xl mx-auto">
-        <div className="bg-surface border border-border rounded-xl p-6">
-          <h1 className="text-2xl font-bold text-navy mb-2">Permission Denied</h1>
-          <p className="text-sm text-slate-600 mb-4">
-            Visitors do not have access to billing settings.
+      <div className="p-8 max-w-7xl mx-auto">
+        <div className="bg-white border border-slate-200/60 rounded-[2rem] p-12 text-center shadow-sm">
+          <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-rose-500">
+            <ShieldCheck className="w-8 h-8" />
+          </div>
+          <h1 className="text-2xl font-display font-bold text-midnight mb-2 tracking-tight">Access Restricted</h1>
+          <p className="text-slate-600 mb-8 max-w-sm mx-auto">
+            Only administrators are authorized to manage billing and subscription settings.
           </p>
           <Link
             href="/dashboard"
-            className="inline-block bg-brand text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-brand-dark transition-colors"
+            className="inline-flex bg-brand text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-brand-dark transition-all shadow-lg shadow-brand/20"
           >
-            Go to Dashboard
+            Return to Dashboard
           </Link>
         </div>
       </div>
@@ -98,125 +101,152 @@ export default async function BillingPage() {
   const usedContracts = Number(contractCount || 0)
   const contractLimit = org?.contract_limit || 2
   const isProPlan = currentPlan === 'pro'
-  const usageDisplay = isProPlan ? `${usedContracts}` : `${usedContracts} / ${contractLimit}`
+  const usageDisplay = isProPlan ? `${usedContracts}` : `${usedContracts} of ${contractLimit}`
   const usagePercent = (Number(contractCount) || 0) / contractLimit
 
-  const usageBarColor = usagePercent >= 1 ? 'bg-red-500' : usagePercent > 0.8 ? 'bg-amber-400' : 'bg-brand'
+  const usageBarColor = usagePercent >= 1 ? 'bg-rose-500' : usagePercent > 0.8 ? 'bg-amber-400' : 'bg-brand'
 
   return (
-    <div className="p-4 md:p-6 max-w-5xl mx-auto">
-      <div className="mb-5 md:mb-6">
-        <h1 className="text-xl md:text-2xl font-bold text-navy">Billing & Plan</h1>
-        <p className="text-muted text-sm mt-0.5">Manage your subscription</p>
+    <div className="p-6 md:p-8 lg:p-10 max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-display font-bold text-midnight tracking-tight">Billing & Plan</h1>
+        <p className="text-muted text-sm mt-1">Manage your professional subscription and usage.</p>
       </div>
 
-      <div className="bg-navy rounded-xl p-5 mb-5 md:mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-center sm:text-left">
-          <p className="text-white/60 text-xs md:text-sm mb-1">Current plan</p>
-          <p className="text-white text-xl md:text-2xl font-bold capitalize">{currentPlan}</p>
-          <p className="text-white/60 text-xs md:text-sm mt-1">
-            {usageDisplay} contracts used
-          </p>
-        </div>
-        <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-surface/10 flex items-center justify-center shrink-0">
-          <CreditCard className="w-6 h-6 md:w-7 md:h-7 text-white" />
-        </div>
-      </div>
-
-      <div className="bg-surface border border-border rounded-xl p-4 md:p-5 mb-5 md:mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs md:text-sm font-medium text-slate-700">Contract usage</span>
-          <span className="text-xs md:text-sm text-muted">{usageDisplay}</span>
-        </div>
-        {!isProPlan && (
-          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div
-              className={`h-full ${usageBarColor} rounded-full transition-all`}
-              style={{ width: `${Math.min(100, usagePercent * 100)}%` }}
-            />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+        {/* Current Plan Overview */}
+        <div className="lg:col-span-2 bg-midnight rounded-[2rem] p-8 shadow-2xl relative overflow-hidden flex flex-col justify-between min-h-[220px]">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[100px] pointer-events-none" />
+          
+          <div className="relative z-10 flex items-start justify-between">
+            <div>
+              <p className="text-slate-400 text-[10px] uppercase font-bold tracking-[0.2em] mb-2">Current Active Subscription</p>
+              <h2 className="text-white text-3xl font-display font-bold tracking-tight capitalize">{currentPlan} Plan</h2>
+              <div className="mt-4 flex items-center gap-2">
+                <span className="text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">Active Status</span>
+                <span className="text-white/40 text-[10px] font-medium tracking-wide">Next billing date: Coming soon</span>
+              </div>
+            </div>
+            <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white">
+              <Sparkles className="w-7 h-7" />
+            </div>
           </div>
-        )}
-        {!isProPlan && (Number(contractCount) || 0) >= contractLimit && (
-          <p className="text-xs text-red-600 mt-2">Limit reached. Upgrade to add more contracts.</p>
-        )}
+
+          <div className="relative z-10 mt-8">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-white text-sm font-bold tracking-tight">Contract Usage</p>
+              <p className="text-slate-400 text-sm font-medium">{usageDisplay} contracts</p>
+            </div>
+            <div className="h-2.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
+              <div
+                className={`h-full ${usageBarColor} rounded-full transition-all duration-1000 ease-out shadow-lg`}
+                style={{ width: `${Math.min(100, usagePercent * 100)}%` }}
+              />
+            </div>
+            {!isProPlan && (Number(contractCount) || 0) >= contractLimit && (
+              <p className="text-rose-400 text-[10px] font-bold uppercase tracking-wider mt-3">Usage limit reached. Please upgrade to continue adding contracts.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Payment History Peek / Card */}
+        <div className="bg-white border border-slate-200/60 rounded-[2rem] p-8 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 mb-6 border border-slate-100">
+              <CreditCard className="w-6 h-6" />
+            </div>
+            <h3 className="text-midnight font-display font-bold text-lg mb-1 tracking-tight">Secure Payments</h3>
+            <p className="text-muted text-sm leading-relaxed">Transactions are handled via Razorpay with industry-standard 256-bit encryption.</p>
+          </div>
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-6">Payment Method: Razorpay</p>
+        </div>
       </div>
 
-      <div className="mb-3">
-        <h2 className="text-lg font-semibold text-navy">Choose your plan</h2>
-        <p className="text-sm text-muted mt-1">Simple pricing with clear limits and room to grow.</p>
+      <div className="mb-8 text-center sm:text-left">
+        <h2 className="text-2xl font-display font-bold text-midnight tracking-tight">Select your plan</h2>
+        <p className="text-muted text-sm mt-1">Upgrade to unlock higher limits and advanced automation.</p>
       </div>
 
-      <div className="grid gap-4 md:gap-6 md:grid-cols-2 xl:grid-cols-3 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {PLANS.map(plan => (
           <div key={plan.id}
-            className={`rounded-2xl border p-5 md:p-6 shadow-sm flex flex-col min-h-[480px] md:min-h-[520px] ${
-              plan.id === currentPlan
-                ? 'border-brand bg-blue-50/60'
-                : plan.highlight
-                ? 'border-brand bg-surface'
-                : 'border-border bg-surface'
+            className={`rounded-[2.5rem] p-1 flex flex-col transition-all duration-300 ${
+              plan.highlight 
+                ? 'bg-gradient-to-b from-indigo-500 via-indigo-600 to-indigo-700 shadow-2xl shadow-indigo-500/20 scale-105 z-10' 
+                : 'bg-slate-200 shadow-sm border border-transparent'
             }`}>
-            <div className="flex items-center gap-2 min-h-7 mb-4">
-              {plan.id === 'starter' && (
-                <div className="text-xs bg-brand text-white px-2.5 py-1 rounded-full inline-block font-medium">Most Popular</div>
-              )}
-              {plan.id === currentPlan && (
-                <div className="text-xs bg-active-bg text-active-text px-2.5 py-1 rounded-full inline-block font-medium">Current</div>
-              )}
-            </div>
-
-            <div className="mb-5">
-              <div className="font-bold text-navy text-3xl tracking-tight">{plan.name}</div>
-              <div className="text-3xl font-bold text-brand mt-2">{plan.priceLabel}</div>
-              <p className="text-sm text-muted mt-3 leading-relaxed">{plan.description}</p>
-            </div>
-
-            <ul className="space-y-3 mb-8 flex-1">
-              {plan.features.map(f => (
-                <li key={f.text} className="text-sm flex items-start gap-2">
-                  {f.live ? (
-                    <span className="text-green-500 mt-0.5 shrink-0"><Check className="w-4 h-4" /></span>
-                  ) : (
-                    <span className="text-amber-400 text-xs mt-0.5 shrink-0">◷</span>
-                  )}
-                  <span className={f.live ? 'text-slate-600 leading-6' : 'text-muted italic leading-6'}>
-                    {f.text}
-                    {!f.live && ' — soon'}
-                  </span>
-                </li>
-              ))}
-            </ul>
-
-            {plan.id === 'free' ? (
-              currentPlan === 'free' ? (
-                <div className="text-center text-sm text-active-text font-semibold py-3 bg-active-bg rounded-xl mt-auto">✓ Current Plan</div>
-              ) : (
-                <div className="text-center text-sm text-muted py-3 bg-page border border-border rounded-xl mt-auto cursor-not-allowed">Downgrade not available</div>
-              )
-            ) : plan.id === currentPlan ? (
-              <div className="flex flex-col gap-2 mt-auto">
-                <div className="text-center text-sm text-active-text font-semibold py-3 bg-active-bg rounded-xl">✓ Active Plan</div>
+            <div className={`flex-1 rounded-[2.3rem] p-8 md:p-10 flex flex-col ${
+              plan.highlight ? 'bg-white' : 'bg-slate-50'
+            }`}>
+              <div className="flex items-center justify-between mb-8">
+                <div className={`text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1.5 rounded-full ${
+                  plan.highlight ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-200/50 text-slate-500'
+                }`}>
+                  {plan.id === currentPlan ? 'Active Plan' : plan.id === 'starter' ? 'Best Value' : 'Standard'}
+                </div>
+                {plan.highlight && <Sparkles className="w-5 h-5 text-indigo-500 fill-indigo-500/20" />}
               </div>
-            ) : (
-              <div className="mt-auto">
-                <RazorpayButton
-                  planId={plan.id}
-                  planName={plan.name}
-                  orgId={member.org_id}
-                  userEmail={user.email || ''}
-                  userName={user.user_metadata?.full_name || ''}
-                  currentPlan={currentPlan}
-                />
+
+              <div className="mb-10">
+                <h3 className="text-2xl font-display font-bold text-midnight tracking-tight">{plan.name}</h3>
+                <div className="flex items-baseline gap-1 mt-4">
+                  <span className="text-4xl font-display font-extrabold text-midnight tracking-tighter">{plan.priceLabel}</span>
+                  <span className="text-slate-400 font-semibold text-sm">{plan.period}</span>
+                </div>
+                <p className="text-slate-500 text-sm mt-4 leading-relaxed font-medium">{plan.description}</p>
               </div>
-            )}
+
+              <ul className="space-y-4 mb-12 flex-1">
+                {plan.features.map(f => (
+                  <li key={f.text} className="flex items-start gap-3">
+                    <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+                      f.live ? (plan.highlight ? 'bg-indigo-500 text-white' : 'bg-slate-200 text-slate-500') : 'bg-slate-100 text-slate-300'
+                    }`}>
+                      {f.live ? <Check className="w-3 h-3" strokeWidth={4} /> : <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />}
+                    </div>
+                    <span className={`text-sm font-semibold tracking-tight ${
+                      f.live ? 'text-slate-600' : 'text-slate-400 italic'
+                    }`}>
+                      {f.text}
+                      {!f.live && <span className="ml-1 text-[9px] uppercase tracking-tighter opacity-70">(soon)</span>}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-auto pt-8">
+                {plan.id === currentPlan ? (
+                  <div className={`w-full text-center text-sm font-bold py-4 rounded-2xl border ${
+                    plan.highlight ? 'border-indigo-100 bg-indigo-50 text-indigo-600' : 'border-slate-200 bg-white text-slate-800'
+                  }`}>
+                    Current Subscription
+                  </div>
+                ) : plan.id === 'free' ? (
+                   <div className="w-full text-center text-xs font-bold py-4 rounded-2xl text-slate-400 bg-slate-100 cursor-not-allowed">
+                    Downgrade unavailable
+                  </div>
+                ) : (
+                  <RazorpayButton
+                    planId={plan.id}
+                    planName={plan.name}
+                    orgId={member.org_id}
+                    userEmail={user.email || ''}
+                    userName={user.user_metadata?.full_name || ''}
+                    currentPlan={currentPlan}
+                  />
+                )}
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
-      <p className="text-sm text-muted text-center mt-2">
-        Payments are processed securely via Razorpay. No card details stored on our servers.
-        Cancel anytime by emailing <a href="mailto:support.clausr@gmail.com" className="text-brand hover:underline">support.clausr@gmail.com</a>
-      </p>
+      <div className="mt-16 pt-8 border-t border-slate-100 text-center">
+        <p className="text-slate-400 text-xs font-medium max-w-xl mx-auto leading-relaxed">
+          Need a custom plan for a larger organization? <br className="hidden sm:block" />
+          Contact us at <a href="mailto:support.clausr@gmail.com" className="text-brand font-bold hover:underline">support.clausr@gmail.com</a> for enterprise options.
+        </p>
+      </div>
     </div>
   )
 }

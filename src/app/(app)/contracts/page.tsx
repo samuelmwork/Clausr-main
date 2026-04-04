@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { formatCurrency, formatDate, daysUntil, urgencyColor, urgencyLabel, contractTypeLabel, computeContractStatus } from '@/lib/utils'
 import { getUserRole, Permissions } from '@/lib/permissions'
 import type { Contract } from '@/types'
+import { Plus, Search, Filter, ChevronRight, FileText } from 'lucide-react'
 
 const CONTRACT_TYPES = [
   { value: '', label: 'All types' },
@@ -18,7 +19,7 @@ const CONTRACT_TYPES = [
 ]
 
 const STATUS_FILTERS = [
-  { value: '', label: 'All' },
+  { value: '', label: 'All Status' },
   { value: 'active', label: 'Active' },
   { value: 'expiring', label: 'Expiring' },
   { value: 'expired', label: 'Expired' },
@@ -26,11 +27,11 @@ const STATUS_FILTERS = [
 ]
 
 const STATUS_COLORS: Record<string, string> = {
-  active: 'bg-active-bg text-active-text',
-  expiring: 'bg-expiring-bg text-expiring-text',
-  expired: 'bg-expired-bg text-expired-text',
-  cancelled: 'bg-cancelled-bg text-cancelled-text',
-  renewed: 'bg-renewed-bg text-renewed-text',
+  active: 'bg-active-bg text-active-text border border-emerald-100',
+  expiring: 'bg-expiring-bg text-expiring-text border border-amber-100',
+  expired: 'bg-expired-bg text-expired-text border border-rose-100',
+  cancelled: 'bg-cancelled-bg text-cancelled-text border border-slate-100',
+  renewed: 'bg-renewed-bg text-renewed-text border border-blue-100',
 }
 
 export default function ContractsPage() {
@@ -42,8 +43,7 @@ export default function ContractsPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
   const [userRole, setUserRole] = useState<'admin' | 'editor' | 'viewer' | null>(null)
-  const [orgId, setOrgId] = useState('')
-
+  
   const statusFilter = searchParams.get('status') || ''
   const typeFilter = searchParams.get('type') || ''
 
@@ -58,7 +58,6 @@ export default function ContractsPage() {
       const member = members?.[0]
       if (!member) { setLoading(false); return }
 
-      setOrgId(member.org_id)
       const role = await getUserRole(supabase, member.org_id)
       setUserRole(role)
 
@@ -113,160 +112,183 @@ export default function ContractsPage() {
 
   if (loading) {
     return (
-      <div className="p-4 md:p-6 max-w-5xl mx-auto">
-        <div className="flex items-center justify-center py-16">
-          <div className="text-muted text-sm">Loading contracts...</div>
+      <div className="p-8 max-w-7xl mx-auto">
+        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+          <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center animate-pulse">
+            <FileText className="w-6 h-6 text-slate-300" />
+          </div>
+          <div className="text-muted text-sm font-medium animate-pulse">Fetching your contracts...</div>
         </div>
       </div>
     )
   }
 
+  const canAdd = Permissions.canAddContract(userRole)
+
   return (
-    <div className="p-4 md:p-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-4 md:mb-5">
+    <div className="p-6 md:p-8 lg:p-10 max-w-7xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-navy">Contracts</h1>
-          <p className="text-muted text-sm mt-0.5">{contracts.length} contracts</p>
+          <h1 className="text-3xl font-display font-bold text-midnight tracking-tight">Contracts</h1>
+          <p className="text-muted text-sm mt-1">You have <span className="text-midnight font-bold">{contracts.length}</span> active vendor contracts.</p>
         </div>
-        {Permissions.canAddContract(userRole) && (
+        {canAdd && (
           <Link href="/contracts/new"
-            className="bg-brand text-white px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-sm font-semibold hover:bg-brand-dark transition-colors flex items-center gap-1.5">
-            <span className="text-base leading-none">+</span>
-            <span className="hidden sm:inline">Add contract</span>
-            <span className="sm:hidden">Add</span>
+            className="bg-brand text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-brand-dark transition-all flex items-center gap-2 shadow-lg shadow-brand/20 active:scale-[0.98]">
+            <Plus className="w-4 h-4" />
+            <span>New contract</span>
           </Link>
         )}
       </div>
 
-      {/* Filters */}
-      <div className="bg-surface border border-border rounded-xl p-3 md:p-4 mb-4 md:mb-5 space-y-3">
-        <form onSubmit={handleSearch}>
+      {/* Modern Filter Section */}
+      <div className="bg-white border border-slate-200/60 rounded-[2rem] p-4 mb-8 shadow-sm flex flex-col md:flex-row gap-4 items-center">
+        <form onSubmit={handleSearch} className="relative w-full md:flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             name="q"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search vendor name…"
-            className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+            placeholder="Search vendor name or keyword…"
+            className="w-full bg-slate-50 border-none rounded-2xl pl-11 pr-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-brand/20 transition-all placeholder:text-slate-400 outline-none"
           />
         </form>
-        <div className="flex gap-2 flex-wrap">
-          {STATUS_FILTERS.map(f => (
-            <button
-              key={f.value}
-              onClick={() => updateFilter('status', f.value)}
-              className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${
-                statusFilter === f.value ? 'bg-brand text-white' : 'bg-gray-100 text-slate-600 hover:bg-gray-200'
-              }`}>
-              {f.label}
-            </button>
-          ))}
+        
+        <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+          <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-2xl border border-slate-100">
+            {STATUS_FILTERS.slice(0, 4).map(f => (
+              <button
+                key={f.value}
+                onClick={() => updateFilter('status', f.value)}
+                className={`text-[11px] px-4 py-1.5 rounded-xl font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
+                  statusFilter === f.value 
+                    ? 'bg-white text-brand shadow-sm ring-1 ring-slate-200' 
+                    : 'text-slate-500 hover:text-midnight'
+                }`}>
+                {f.label.split(' ')[0]}
+              </button>
+            ))}
+          </div>
+          
+          <div className="h-8 w-px bg-slate-200 mx-1 hidden md:block" />
+          
           <select
             value={typeFilter}
             onChange={(e) => updateFilter('type', e.target.value)}
-            className="text-xs border border-border rounded-full px-2.5 py-1.5 bg-surface focus:outline-none ml-auto">
+            className="bg-slate-50 border-none rounded-2xl px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-600 outline-none focus:ring-2 focus:ring-brand/20 cursor-pointer">
             {CONTRACT_TYPES.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
           </select>
         </div>
       </div>
 
       {contracts.length === 0 ? (
-        <div className="bg-surface border border-border rounded-xl py-16 text-center">
-          <p className="text-muted text-sm mb-4">No contracts found.</p>
-          {Permissions.canAddContract(userRole) && (
-            <Link href="/contracts/new" className="bg-brand text-white px-5 py-2.5 rounded-xl text-sm font-semibold">
-              Add your first contract
+        <div className="bg-white border border-slate-200/60 rounded-[2rem] py-32 text-center px-8 shadow-sm">
+          <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-slate-100">
+            <Search className="w-10 h-10 text-slate-200" />
+          </div>
+          <h3 className="text-midnight font-display font-bold text-xl mb-2">No contracts found</h3>
+          <p className="text-muted text-sm max-w-sm mx-auto mb-10 font-medium">Try adjusting your search or filters to find what you&apos;re looking for.</p>
+          {canAdd && (
+            <Link href="/contracts/new" className="inline-flex bg-brand text-white px-8 py-3 rounded-2xl text-sm font-bold hover:bg-brand-dark transition-all shadow-xl shadow-brand/20">
+              Create a new contract
             </Link>
           )}
         </div>
       ) : (
-        <>
-          {/* ── Mobile card view (hidden on md+) ─────────────────────── */}
-          <div className="md:hidden space-y-2">
+        <div className="bg-white border border-slate-200/60 rounded-[2rem] overflow-hidden shadow-sm">
+          {/* Table for Desktop */}
+          <table className="w-full text-left border-collapse hidden md:table">
+            <thead>
+              <tr className="border-b border-slate-50">
+                <th className="px-8 py-5 text-[11px] font-bold uppercase tracking-widest text-slate-400">Vendor & Service</th>
+                <th className="px-8 py-5 text-[11px] font-bold uppercase tracking-widest text-slate-400">Value (Annual)</th>
+                <th className="px-8 py-5 text-[11px] font-bold uppercase tracking-widest text-slate-400">Renewal Date</th>
+                <th className="px-8 py-5 text-[11px] font-bold uppercase tracking-widest text-slate-400">Status</th>
+                <th className="px-8 py-5 text-[11px] font-bold uppercase tracking-widest text-slate-400">Timeline</th>
+                <th className="px-8 py-5"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {contracts.map(c => {
+                const days = daysUntil(c.end_date)
+                return (
+                  <tr key={c.id} className="group hover:bg-slate-50/50 transition-all">
+                    <td className="px-8 py-5">
+                      <Link href={`/contracts/${c.id}`} className="block">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-brand/10 group-hover:text-brand transition-all">
+                            <FileText className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-midnight group-hover:text-brand transition-colors">{c.vendor_name}</p>
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">{contractTypeLabel(c.contract_type)}</p>
+                          </div>
+                        </div>
+                      </Link>
+                    </td>
+                    <td className="px-8 py-5 font-bold text-slate-700">
+                      {c.value_annual ? formatCurrency(c.value_annual, c.currency) : <span className="text-slate-300 font-medium">—</span>}
+                    </td>
+                    <td className="px-8 py-5 font-medium text-slate-600 text-sm">
+                      {formatDate(c.end_date)}
+                    </td>
+                    <td className="px-8 py-5">
+                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg ${STATUS_COLORS[c.status] || ''}`}>
+                        {c.status}
+                      </span>
+                    </td>
+                    <td className="px-8 py-5">
+                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg ${urgencyColor(days)} shadow-sm whitespace-nowrap`}>
+                        {urgencyLabel(days)}
+                      </span>
+                    </td>
+                    <td className="px-8 py-5 text-right">
+                      <Link href={`/contracts/${c.id}`} className="p-2 rounded-xl hover:bg-slate-100 transition-all inline-block">
+                        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-midnight transition-colors" />
+                      </Link>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+
+          {/* Cards for Mobile */}
+          <div className="md:hidden divide-y divide-slate-50">
             {contracts.map(c => {
               const days = daysUntil(c.end_date)
               return (
                 <Link key={c.id} href={`/contracts/${c.id}`}
-                  className="flex items-center gap-3 bg-surface border border-border rounded-xl px-4 py-3.5 hover:border-brand/40 hover:bg-page/50 transition-all active:scale-[0.99]">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-navy text-sm truncate">{c.vendor_name}</span>
-                      {c.auto_renews && <span className="text-[10px] bg-expiring-bg text-expiring-text px-1.5 py-0.5 rounded-full flex-shrink-0">Auto</span>}
+                  className="flex flex-col gap-4 p-6 hover:bg-slate-50/50 transition-all active:bg-slate-100">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                        <FileText className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-midnight">{c.vendor_name}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">{contractTypeLabel(c.contract_type)}</p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[c.status] || ''}`}>
-                        {c.status.charAt(0).toUpperCase() + c.status.slice(1)}
-                      </span>
-                      <span className="text-[10px] text-muted">{contractTypeLabel(c.contract_type)}</span>
-                      <span className="text-[10px] text-muted">· {formatDate(c.end_date)}</span>
+                    <div className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md ${STATUS_COLORS[c.status] || ''}`}>
+                      {c.status}
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                    {c.value_annual ? (
-                      <span className="text-sm font-semibold text-slate-700">{formatCurrency(c.value_annual, c.currency)}</span>
-                    ) : null}
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${urgencyColor(days)}`}>
+                  
+                  <div className="flex items-end justify-between mt-2">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Value & Growth</p>
+                      <p className="font-bold text-midnight">{c.value_annual ? formatCurrency(c.value_annual, c.currency) : '—'}</p>
+                    </div>
+                    <div className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg ${urgencyColor(days)} shadow-sm`}>
                       {urgencyLabel(days)}
-                    </span>
+                    </div>
                   </div>
                 </Link>
               )
             })}
           </div>
-
-          {/* ── Desktop table (hidden on mobile) ─────────────────────── */}
-          <div className="hidden md:block bg-surface border border-border rounded-xl overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-page border-b border-border">
-                  <th className="text-left px-5 py-3 text-[10px] font-semibold text-muted uppercase tracking-wide">Vendor</th>
-                  <th className="text-left px-5 py-3 text-[10px] font-semibold text-muted uppercase tracking-wide">Type</th>
-                  <th className="text-left px-5 py-3 text-[10px] font-semibold text-muted uppercase tracking-wide">Value/yr</th>
-                  <th className="text-left px-5 py-3 text-[10px] font-semibold text-muted uppercase tracking-wide">End date</th>
-                  <th className="text-left px-5 py-3 text-[10px] font-semibold text-muted uppercase tracking-wide">Status</th>
-                  <th className="text-left px-5 py-3 text-[10px] font-semibold text-muted uppercase tracking-wide">Days left</th>
-                  <th className="px-5 py-3"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {contracts.map(c => {
-                  const days = daysUntil(c.end_date)
-                  return (
-                    <tr key={c.id} className="hover:bg-page transition-colors">
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-navy text-sm">{c.vendor_name}</span>
-                          {c.auto_renews && <span className="text-xs bg-expiring-bg text-expiring-text px-1.5 py-0.5 rounded-full">Auto</span>}
-                        </div>
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <span className="text-xs bg-gray-100 text-slate-600 px-2 py-1 rounded-full">{contractTypeLabel(c.contract_type)}</span>
-                      </td>
-                      <td className="px-5 py-3.5 text-sm text-slate-700">
-                        {c.value_annual ? formatCurrency(c.value_annual, c.currency) : <span className="text-muted">—</span>}
-                      </td>
-                      <td className="px-5 py-3.5 text-sm text-slate-600">{formatDate(c.end_date)}</td>
-                      <td className="px-5 py-3.5">
-                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${STATUS_COLORS[c.status] || ''}`}>
-                          {c.status.charAt(0).toUpperCase() + c.status.slice(1)}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${urgencyColor(days)}`}>
-                          {urgencyLabel(days)}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3.5 text-right">
-                        <Link href={`/contracts/${c.id}`} className="text-sm text-brand hover:underline font-medium">
-                          View →
-                        </Link>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </>
+        </div>
       )}
     </div>
   )

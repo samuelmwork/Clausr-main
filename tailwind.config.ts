@@ -10,52 +10,49 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        navy: {
-          DEFAULT: '#1B2430',
-          light: '#263241',
+        midnight: {
+          DEFAULT: '#020617',
+          light: '#0f172a',
         },
         brand: {
-          DEFAULT: '#D97706',
-          light: '#FFF1DE',
-          dark: '#B45309',
+          DEFAULT: '#4f46e5', // Indigo 600
+          light: '#eef2ff',
+          dark: '#4338ca',
         },
-        page: '#F5F1EA',
-        surface: '#FFFCF7',
-        border: '#E8DDCF',
-        muted: '#7C7468',
+        page: '#f8fafc', // Slate 50
+        surface: '#ffffff',
+        border: '#e2e8f0', // Slate 200
+        muted: '#64748b', // Slate 500
         active: {
-          bg: '#E7F7EE',
-          text: '#146C43',
+          bg: '#f0fdf4',
+          text: '#15803d',
         },
         expiring: {
-          bg: '#FFF2D9',
-          text: '#9A5A00',
+          bg: '#fffbeb',
+          text: '#b45309',
         },
         expired: {
-          bg: '#FCE8E8',
-          text: '#9C2B2B',
+          bg: '#fef2f2',
+          text: '#b91c1c',
         },
         cancelled: {
-          bg: '#EFE9DF',
-          text: '#736B5F',
+          bg: '#f1f5f9',
+          text: '#475569',
         },
         renewed: {
-          bg: '#E7F3FF',
-          text: '#155EAA',
-        },
-        teal: {
-          50:  '#E1F5EE',
-          400: '#1D9E75',
-          600: '#0F6E56',
+          bg: '#eff6ff',
+          text: '#1d4ed8',
         },
       },
       borderRadius: {
-        lg: '12px',
+        xl: '14px',
+        lg: '10px',
         md: '8px',
         sm: '4px',
       },
       fontFamily: {
-        sans: ['"Avenir Next"', '"Segoe UI"', 'system-ui', 'sans-serif'],
+        sans: ['Inter', '"Avenir Next"', '"Segoe UI"', 'system-ui', 'sans-serif'],
+        display: ['Outfit', 'Inter', 'sans-serif'],
       },
     },
   },
