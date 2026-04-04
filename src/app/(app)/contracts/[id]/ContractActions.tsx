@@ -14,6 +14,7 @@ export default function ContractActions({
 }) {
   const [loading, setLoading] = useState<string | null>(null)
   const [userRole, setUserRole] = useState<'admin' | 'editor' | 'viewer' | null>(null)
+  const [renewed, setRenewed] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -27,20 +28,24 @@ export default function ContractActions({
 
   async function updateStatus(newStatus: string, action: string) {
     setLoading(newStatus)
-    const { data: { user } } = await supabase.auth.getUser()
-    const { error } = await supabase
-      .from('contracts')
-      .update({ status: newStatus })
-      .eq('id', contractId)
-    if (!error) {
-      await supabase.from('activity_log').insert({
-        contract_id: contractId,
-        org_id: orgId,
-        user_id: user?.id,
-        action: `Contract marked as ${action}`,
-      })
-      router.refresh()
+
+    const response = await fetch(`/api/contracts/${contractId}/renew`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    })
+
+    const result = await response.json()
+    console.log('Renew response', response.status, result)
+
+    if (!response.ok) {
+      alert(result?.error || 'Failed to mark contract as renewed.')
+      setLoading(null)
+      return
     }
+
+    setRenewed(newStatus === 'renewed')
+    router.refresh()
     setLoading(null)
   }
 
@@ -62,7 +67,7 @@ export default function ContractActions({
     }
   }
 
-  const isRenewed = status === 'renewed'
+  const isRenewed = status === 'renewed' || renewed
   const canEdit = Permissions.canEditContract(userRole)
   const canDelete = Permissions.canDeleteContract(userRole)
 

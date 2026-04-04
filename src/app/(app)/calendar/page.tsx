@@ -8,8 +8,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 export default async function CalendarPage({
   searchParams,
 }: {
-  searchParams: { month?: string }
+  searchParams: Promise<{ month?: string }>
 }) {
+  const resolvedSearchParams = await searchParams;
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
@@ -19,7 +20,7 @@ export default async function CalendarPage({
   const member = members?.[0]
   if (!member) redirect('/auth/login')
 
-  const baseDate = searchParams.month ? parseISO(`${searchParams.month}-01`) : new Date()
+  const baseDate = resolvedSearchParams.month ? parseISO(`${resolvedSearchParams.month}-01`) : new Date()
   const monthStart = startOfMonth(baseDate)
   const monthEnd   = endOfMonth(baseDate)
   const prevMonth  = format(subMonths(baseDate, 1), 'yyyy-MM')

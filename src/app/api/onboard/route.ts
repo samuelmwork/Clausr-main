@@ -156,9 +156,28 @@ export async function POST(req: Request) {
         }
       }
 
+      // Ensure org names are unique case-insensitively
+      const normalizedOrgName = (orgName || 'My Workspace').trim()
+      if (normalizedOrgName) {
+        const { data: existingOrg, error: existingOrgErr } = await supabase
+          .from('organisations')
+          .select('id')
+          .ilike('name', normalizedOrgName)
+          .limit(1)
+
+        if (existingOrgErr) {
+          console.error('Organisation uniqueness check failed:', existingOrgErr)
+          return NextResponse.json({ error: 'Could not verify organisation uniqueness' }, { status: 500 })
+        }
+
+        if (existingOrg && existingOrg.length > 0) {
+          return NextResponse.json({ error: 'Organization already exists' }, { status: 409 })
+        }
+      }
+
       // Create organisation
       const { data: org, error: orgErr } = await supabase
-        .from('organisations').insert({ name: orgName || 'My Workspace', plan: 'free', contract_limit: 5 })
+        .from('organisations').insert({ name: normalizedOrgName, plan: 'free', contract_limit: 5 })
         .select().single()
       if (orgErr) throw orgErr
 

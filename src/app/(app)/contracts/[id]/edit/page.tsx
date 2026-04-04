@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Lock } from 'lucide-react'
@@ -14,8 +14,9 @@ const CONTRACT_TYPES = [
   { value: 'other', label: 'Other' },
 ]
 
-export default function EditContractPage({ params }: { params: { id: string } }) {
+export default function EditContractPage() {
   const router = useRouter()
+  const params = useParams()
   const supabase = useMemo(() => createClient(), [])
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
@@ -28,7 +29,8 @@ export default function EditContractPage({ params }: { params: { id: string } })
   })
 
   const isPaidPlan = plan !== 'free'
-  const invalidId = !params?.id || params.id === 'undefined'
+  const contractId = params?.id || ''
+  const invalidId = !contractId || contractId === 'undefined'
 
   useEffect(() => {
     supabase.from('members').select('org_id, organisations!inner(plan)')
@@ -43,7 +45,7 @@ export default function EditContractPage({ params }: { params: { id: string } })
   useEffect(() => {
     if (invalidId) return
 
-    supabase.from('contracts').select('*').eq('id', params.id).single()
+    supabase.from('contracts').select('*').eq('id', contractId).single()
       .then(({ data }) => {
         if (data) setForm({
           vendor_name: data.vendor_name || '',
@@ -58,7 +60,7 @@ export default function EditContractPage({ params }: { params: { id: string } })
         })
         setFetching(false)
       })
-  }, [invalidId, params.id, supabase])
+  }, [invalidId, contractId, supabase])
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
@@ -84,10 +86,14 @@ export default function EditContractPage({ params }: { params: { id: string } })
       auto_renews: form.auto_renews,
       notice_days: parseInt(form.notice_days) || 30,
       notes: form.notes,
-    }).eq('id', params.id)
+    }).eq('id', contractId)
 
-    if (updateErr) { setError(updateErr.message); setLoading(false) }
-    else router.push(`/contracts/${params.id}`)
+    if (updateErr) {
+      setError(updateErr.message)
+      setLoading(false)
+    } else {
+      router.push(`/contracts/${contractId}`)
+    }
   }
 
   if (fetching) return <div className="p-6 max-w-5xl mx-auto text-muted text-sm">Loading…</div>
@@ -95,7 +101,7 @@ export default function EditContractPage({ params }: { params: { id: string } })
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <div className="flex items-center gap-3 mb-5 text-sm">
-        <Link href={`/contracts/${params.id}`} className="text-muted hover:text-slate-600">← Contract</Link>
+        <Link href={`/contracts/${contractId}`} className="text-muted hover:text-slate-600">← Contract</Link>
         <span className="text-gray-300">/</span>
         <span className="text-slate-600">Edit</span>
       </div>
