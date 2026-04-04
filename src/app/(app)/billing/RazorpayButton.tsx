@@ -14,6 +14,7 @@ interface Props {
   orgId: string
   userEmail: string
   userName: string
+  currentPlan?: string
 }
 
 type RazorpaySuccessResponse = {
@@ -22,11 +23,25 @@ type RazorpaySuccessResponse = {
   razorpay_signature: string
 }
 
-export default function RazorpayButton({ planId, planName, orgId, userEmail, userName }: Props) {
+export default function RazorpayButton({ planId, planName, orgId, userEmail, userName, currentPlan }: Props) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
+  const isPaidCurrentPlan = currentPlan && currentPlan !== 'free'
+  const buttonLabel = loading
+    ? 'Loading…'
+    : isPaidCurrentPlan
+    ? `Switch to ${planName}`
+    : `Upgrade to ${planName}`
+
   async function handlePayment() {
+    // Warn user if they're switching from an active paid plan
+    if (isPaidCurrentPlan) {
+      const confirmed = window.confirm(
+        `You are currently on the ${currentPlan?.toUpperCase()} plan.\n\nSwitching to ${planName} will immediately cancel your current subscription and start a new one.\n\nContinue?`
+      )
+      if (!confirmed) return
+    }
     setLoading(true)
     try {
       // 1. Create Razorpay subscription
@@ -100,7 +115,7 @@ export default function RazorpayButton({ planId, planName, orgId, userEmail, use
       onClick={handlePayment}
       disabled={loading}
       className="w-full bg-[#185FA5] text-white py-2 rounded-lg text-sm font-semibold hover:bg-[#0C447C] transition-colors disabled:opacity-60">
-      {loading ? 'Loading…' : `Upgrade to ${planName}`}
+      {buttonLabel}
     </button>
   )
 }

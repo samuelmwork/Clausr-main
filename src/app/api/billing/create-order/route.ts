@@ -58,7 +58,7 @@ export async function POST(req: Request) {
 
     const { data: org } = await supabase
       .from('organisations')
-      .select('razorpay_subscription_id, subscription_status')
+      .select('razorpay_subscription_id, subscription_status, plan')
       .eq('id', orgId)
       .single()
 
@@ -66,15 +66,29 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Organization not found' }, { status: 404 })
     }
 
-    if (org.razorpay_subscription_id && ['active', 'authenticated'].includes(org.subscription_status || '')) {
-      return NextResponse.json(
-        {
-          error: 'An active subscription already exists for this organization. Cancel it first before creating a new one.',
-          code: 'SUBSCRIPTION_ALREADY_ACTIVE',
-          subscriptionStatus: org.subscription_status || 'unknown',
-        },
-        { status: 409 }
-      )
+    // If there's an existing active subscription, cancel it immediately before upgrading
+    if (org.razorpay_subscription_id && ['active', 'authenticated', 'created'].includes(org.subscription_status || '')) {
+      try {
+        await razorpay.subscriptions.cancel(org.razorpay_subscription_id, false)
+        console.log(`Cancelled old subscription ${org.razorpay_subscription_id} for org ${orgId}`)
+      } catch (cancelErr: unknown) {
+        const errMsg = cancelErr instanceof Error ? cancelErr.message : String(cancelErr)
+        // If it's already cancelled/completed, we can safely continue
+        if (!errMsg.includes('cancelled') && !errMsg.includes('completed')) {
+          console.error('Failed to cancel old subscription:', errMsg)
+          return NextResponse.json(
+            { error: `Failed to cancel existing subscription before upgrade: ${errMsg}` },
+            { status: 500 }
+          )
+        }
+      }
+
+      await supabase.from('activity_log').insert({
+        org_id: orgId,
+        user_id: user.id,
+        action: `Cancelled old ${org.plan} subscription for upgrade to ${planId}`,
+        details: { old_subscription_id: org.razorpay_subscription_id },
+      })
     }
 
     const subscription = await razorpay.subscriptions.create({

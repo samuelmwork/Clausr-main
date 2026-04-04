@@ -189,11 +189,15 @@ export default async function BillingPage() {
             </ul>
 
             {plan.id === 'free' ? (
-              <Link href="/dashboard" className="block w-full bg-page border border-border text-muted text-sm rounded-xl py-3 font-semibold text-center cursor-not-allowed mt-auto">
-                Start Free
-              </Link>
+              currentPlan === 'free' ? (
+                <div className="text-center text-sm text-active-text font-semibold py-3 bg-active-bg rounded-xl mt-auto">✓ Current Plan</div>
+              ) : (
+                <div className="text-center text-sm text-muted py-3 bg-page border border-border rounded-xl mt-auto cursor-not-allowed">Downgrade not available</div>
+              )
             ) : plan.id === currentPlan ? (
-              <div className="text-center text-sm text-active-text font-semibold py-3 bg-active-bg rounded-xl mt-auto">✓ Active</div>
+              <div className="flex flex-col gap-2 mt-auto">
+                <div className="text-center text-sm text-active-text font-semibold py-3 bg-active-bg rounded-xl">✓ Active Plan</div>
+              </div>
             ) : (
               <div className="mt-auto">
                 <RazorpayButton
@@ -202,6 +206,7 @@ export default async function BillingPage() {
                   orgId={member.org_id}
                   userEmail={user.email || ''}
                   userName={user.user_metadata?.full_name || ''}
+                  currentPlan={currentPlan}
                 />
               </div>
             )}
