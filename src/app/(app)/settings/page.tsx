@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { getUserRole } from '@/lib/permissions'
@@ -22,6 +22,7 @@ export default function SettingsPage() {
   const [changingRoleFor, setChangingRoleFor] = useState<string | null>(null)
   const [currentPlan, setCurrentPlan] = useState('free')
   const [currentUserId, setCurrentUserId] = useState('')
+  const orgChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
 
   const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
@@ -86,7 +87,45 @@ export default function SettingsPage() {
       }
     }
     load()
+
+    return () => {
+      if (orgChannelRef.current) {
+        supabase.removeChannel(orgChannelRef.current)
+        orgChannelRef.current = null
+      }
+    }
   }, [supabase])
+
+  // Subscribe to org name changes in real-time so all teammates see updates
+  useEffect(() => {
+    if (!orgId) return
+
+    // Remove any existing channel before creating a new one
+    if (orgChannelRef.current) {
+      supabase.removeChannel(orgChannelRef.current)
+    }
+
+    const channel = supabase
+      .channel(`org-name-${orgId}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'organisations', filter: `id=eq.${orgId}` },
+        (payload) => {
+          const newName = (payload.new as { name?: string }).name
+          if (newName !== undefined) {
+            setOrgName(newName)
+          }
+        }
+      )
+      .subscribe()
+
+    orgChannelRef.current = channel
+
+    return () => {
+      supabase.removeChannel(channel)
+      orgChannelRef.current = null
+    }
+  }, [orgId, supabase])
 
   async function saveProfile() {
     setSaving(true)

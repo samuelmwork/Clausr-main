@@ -393,3 +393,11 @@ create unique index if not exists idx_organisations_name_unique on public.organi
 create unique index if not exists idx_profiles_email_unique on public.profiles(lower(email)) where email is not null;
 create index idx_alerts_scheduled on public.alerts(scheduled_for) where sent = false;
 create index idx_activity_org_id on public.activity_log(org_id);
+
+-- ============================================================
+-- REALTIME — Enable Realtime on organisations table
+-- This allows teammates to see org name changes instantly
+-- Run in Supabase SQL Editor if not already done:
+-- ============================================================
+alter publication supabase_realtime add table public.organisations;
+
