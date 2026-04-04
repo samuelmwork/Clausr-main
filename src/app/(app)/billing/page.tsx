@@ -46,7 +46,6 @@ const PLANS = [
     features: [
       { text: 'Unlimited contracts', live: true },
       { text: 'Up to 5 team members', live: true },
-      { text: 'Assign contract owners', live: true },
       { text: 'Shared workspace for ops + finance', live: true },
       { text: 'Everything in Starter', live: true },
       { text: 'CSV import', live: false },
