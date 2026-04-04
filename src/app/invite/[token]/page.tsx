@@ -10,6 +10,7 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [invitation, setInvitation] = useState<any>(null)
+  const [currentUser, setCurrentUser] = useState<any>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -38,6 +39,9 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
           return
         }
 
+        const { data: authData } = await supabase.auth.getUser()
+        setCurrentUser(authData?.user || null)
+
         setInvitation(data)
       } catch (err) {
         console.error('Unexpected invitation load error:', err)
@@ -59,6 +63,12 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       router.push(`/auth/signup?invite=${token}`)
+      return
+    }
+
+    if (user.email !== invitation.email) {
+      setError(`You are logged in as ${user.email}. Please sign out to accept this invitation for ${invitation.email}.`)
+      setLoading(false)
       return
     }
 
@@ -133,12 +143,30 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
           </p>
         </div>
 
-        <button
-          onClick={acceptInvitation}
-          disabled={loading}
-          className="w-full bg-[#185FA5] text-white py-3 rounded-lg font-semibold hover:bg-[#0C447C] transition-colors disabled:opacity-60 mb-4">
-          {loading ? 'Accepting...' : 'Accept Invitation'}
-        </button>
+        {currentUser && currentUser.email !== invitation.email ? (
+          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+            <p className="mb-3">
+              You are currently logged in as <strong>{currentUser.email}</strong>. This invitation is for <strong>{invitation.email}</strong>.
+            </p>
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut()
+                // Force a full reload to clear any cached states
+                window.location.reload()
+              }}
+              className="w-full bg-white border border-amber-300 text-amber-900 py-2 rounded font-semibold hover:bg-amber-100 transition-colors"
+            >
+              Sign out to continue
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={acceptInvitation}
+            disabled={loading}
+            className="w-full bg-[#185FA5] text-white py-3 rounded-lg font-semibold hover:bg-[#0C447C] transition-colors disabled:opacity-60 mb-4">
+            {loading ? 'Accepting...' : 'Accept Invitation'}
+          </button>
+        )}
 
         <p className="text-xs text-muted text-center">
           By accepting, you&apos;ll have access to all contracts and team features.
