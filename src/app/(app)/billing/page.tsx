@@ -105,29 +105,29 @@ export default async function BillingPage() {
   const usageBarColor = usagePercent >= 1 ? 'bg-red-500' : usagePercent > 0.8 ? 'bg-amber-400' : 'bg-brand'
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-navy">Billing & Plan</h1>
+    <div className="p-4 md:p-6 max-w-5xl mx-auto">
+      <div className="mb-5 md:mb-6">
+        <h1 className="text-xl md:text-2xl font-bold text-navy">Billing & Plan</h1>
         <p className="text-muted text-sm mt-0.5">Manage your subscription</p>
       </div>
 
-      <div className="bg-navy rounded-xl p-5 mb-6 flex items-center justify-between">
-        <div>
-          <p className="text-white/60 text-sm mb-1">Current plan</p>
-          <p className="text-white text-2xl font-bold capitalize">{currentPlan}</p>
-          <p className="text-white/60 text-sm mt-1">
+      <div className="bg-navy rounded-xl p-5 mb-5 md:mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="text-center sm:text-left">
+          <p className="text-white/60 text-xs md:text-sm mb-1">Current plan</p>
+          <p className="text-white text-xl md:text-2xl font-bold capitalize">{currentPlan}</p>
+          <p className="text-white/60 text-xs md:text-sm mt-1">
             {usageDisplay} contracts used
           </p>
         </div>
-        <div className="w-14 h-14 rounded-full bg-surface/10 flex items-center justify-center">
-          <CreditCard className="w-7 h-7 text-white" />
+        <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-surface/10 flex items-center justify-center shrink-0">
+          <CreditCard className="w-6 h-6 md:w-7 md:h-7 text-white" />
         </div>
       </div>
 
-      <div className="bg-surface border border-border rounded-xl p-5 mb-6">
+      <div className="bg-surface border border-border rounded-xl p-4 md:p-5 mb-5 md:mb-6">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-slate-700">Contract usage</span>
-          <span className="text-sm text-muted">{usageDisplay}</span>
+          <span className="text-xs md:text-sm font-medium text-slate-700">Contract usage</span>
+          <span className="text-xs md:text-sm text-muted">{usageDisplay}</span>
         </div>
         {!isProPlan && (
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -138,7 +138,7 @@ export default async function BillingPage() {
           </div>
         )}
         {!isProPlan && (Number(contractCount) || 0) >= contractLimit && (
-          <p className="text-sm text-red-600 mt-2">Limit reached. Upgrade to add more contracts.</p>
+          <p className="text-xs text-red-600 mt-2">Limit reached. Upgrade to add more contracts.</p>
         )}
       </div>
 
@@ -147,10 +147,10 @@ export default async function BillingPage() {
         <p className="text-sm text-muted mt-1">Simple pricing with clear limits and room to grow.</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3 mb-10">
+      <div className="grid gap-4 md:gap-6 md:grid-cols-2 xl:grid-cols-3 mb-10">
         {PLANS.map(plan => (
           <div key={plan.id}
-            className={`rounded-2xl border p-6 shadow-sm flex flex-col min-h-[520px] ${
+            className={`rounded-2xl border p-5 md:p-6 shadow-sm flex flex-col min-h-[480px] md:min-h-[520px] ${
               plan.id === currentPlan
                 ? 'border-brand bg-blue-50/60'
                 : plan.highlight

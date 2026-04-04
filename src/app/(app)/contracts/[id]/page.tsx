@@ -80,20 +80,20 @@ export default async function ContractDetailPage({ params, searchParams }: {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <div className="flex items-center gap-2 mb-6 text-sm">
+    <div className="p-4 md:p-6 max-w-5xl mx-auto">
+      <div className="flex items-center gap-2 mb-4 md:mb-6 text-sm">
         <Link href="/contracts" className="text-muted hover:text-slate-600">Contracts</Link>
         <span className="text-gray-300">/</span>
-        <span className="text-slate-700 font-medium">{contract.vendor_name}</span>
+        <span className="text-slate-700 font-medium truncate">{contract.vendor_name}</span>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-5">
-        <div className="md:col-span-2 space-y-5">
-          <div className="bg-surface border border-border rounded-xl p-5">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h1 className="text-2xl font-bold text-navy">{contract.vendor_name}</h1>
-                <div className="flex items-center gap-2 mt-1.5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+        <div className="md:col-span-2 space-y-4 md:space-y-5">
+          <div className="bg-surface border border-border rounded-xl p-4 md:p-5">
+            <div className="flex items-start justify-between mb-3 md:mb-4">
+              <div className="flex-1 min-w-0">
+                <h1 className="text-xl md:text-2xl font-bold text-navy">{contract.vendor_name}</h1>
+                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                   <span className="text-xs bg-gray-100 text-slate-600 px-2 py-1 rounded-full">{contractTypeLabel(contract.contract_type)}</span>
                   {contract.auto_renews && <span className="text-xs bg-expiring-bg text-expiring-text px-2 py-1 rounded-full">Auto-renews</span>}
                   <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusColor}`}>{statusLabel}</span>
@@ -101,13 +101,13 @@ export default async function ContractDetailPage({ params, searchParams }: {
               </div>
               {canEdit && (
                 <Link href={`/contracts/${contract.id}/edit`}
-                  className="text-sm border border-border px-3 py-1.5 rounded-lg text-slate-600 hover:bg-page transition-colors">
+                  className="ml-3 flex-shrink-0 text-sm border border-border px-3 py-1.5 rounded-lg text-slate-600 hover:bg-page transition-colors">
                   Edit
                 </Link>
               )}
             </div>
 
-            <dl className="grid grid-cols-2 gap-3">
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
               {infoRows.map(row => (
                 <div key={row.label}>
                   <dt className="text-xs text-muted mb-0.5">{row.label}</dt>

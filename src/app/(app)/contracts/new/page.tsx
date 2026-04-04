@@ -108,13 +108,13 @@ export default function NewContractPage() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <div className="flex items-center gap-3 mb-5">
+    <div className="p-4 md:p-6 max-w-5xl mx-auto">
+      <div className="flex items-center gap-3 mb-4 md:mb-5">
         <Link href="/contracts" className="text-muted hover:text-slate-600 transition-colors text-sm">← Contracts</Link>
         <span className="text-gray-300">/</span>
         <span className="text-sm text-slate-600">New contract</span>
       </div>
-      <h1 className="text-2xl font-bold text-navy mb-5">Add contract</h1>
+      <h1 className="text-xl md:text-2xl font-bold text-navy mb-4 md:mb-5">Add contract</h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {error && <div className="bg-expired-bg border border-expired-text text-expired-text text-sm px-4 py-3 rounded-xl">{error}</div>}
@@ -122,7 +122,7 @@ export default function NewContractPage() {
         <div className="bg-surface border border-border rounded-xl p-5 space-y-4">
           <h2 className="font-semibold text-navy text-sm">Contract details</h2>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="col-span-2">
               <label className="block text-sm font-medium text-slate-700 mb-1">Vendor name <span className="text-red-500">*</span></label>
               <input value={form.vendor_name} onChange={set('vendor_name')} required
@@ -146,7 +146,7 @@ export default function NewContractPage() {
 
         <div className="bg-surface border border-border rounded-xl p-5 space-y-4">
           <h2 className="font-semibold text-navy text-sm">Financial details</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Annual value</label>
               <input type="number" value={form.value_annual} onChange={set('value_annual')} placeholder="0"
@@ -166,7 +166,7 @@ export default function NewContractPage() {
 
         <div className="bg-surface border border-border rounded-xl p-5 space-y-4">
           <h2 className="font-semibold text-navy text-sm">Dates</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Start date</label>
               <input type="date" value={form.start_date} onChange={set('start_date')}
@@ -243,12 +243,12 @@ export default function NewContractPage() {
           </div>
         )}
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button type="submit" disabled={loading}
             className="flex-1 bg-brand text-white py-3 rounded-xl text-sm font-semibold hover:bg-brand-dark transition-colors disabled:opacity-60">
             {loading ? 'Saving…' : 'Save contract'}
           </button>
-          <Link href="/contracts" className="px-6 py-3 rounded-xl border border-border text-sm font-semibold text-slate-600 hover:bg-page transition-colors">
+          <Link href="/contracts" className="sm:px-6 py-3 rounded-xl border border-border text-sm font-semibold text-slate-600 hover:bg-page transition-colors text-center">
             Cancel
           </Link>
         </div>

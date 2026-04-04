@@ -53,19 +53,19 @@ export default async function CalendarPage({
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-navy">Calendar</h1>
-        <div className="flex items-center gap-3">
-          <Link href={`/calendar?month=${prevMonth}`} className="text-muted hover:text-slate-600 p-1">
-            <ChevronLeft className="w-5 h-5" />
+    <div className="p-3 md:p-6 max-w-5xl mx-auto">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 md:mb-6">
+        <h1 className="text-xl md:text-2xl font-bold text-navy">Calendar</h1>
+        <div className="flex items-center gap-2">
+          <Link href={`/calendar?month=${prevMonth}`} className="text-muted hover:text-slate-600 p-1.5 rounded-lg hover:bg-page transition-colors">
+            <ChevronLeft className="w-4 h-4" />
           </Link>
-          <span className="font-semibold text-navy min-w-36 text-center">{format(baseDate, 'MMMM yyyy')}</span>
-          <Link href={`/calendar?month=${nextMonth}`} className="text-muted hover:text-slate-600 p-1">
-            <ChevronRight className="w-5 h-5" />
+          <span className="font-semibold text-navy min-w-28 text-center text-sm md:text-base md:min-w-36">{format(baseDate, 'MMMM yyyy')}</span>
+          <Link href={`/calendar?month=${nextMonth}`} className="text-muted hover:text-slate-600 p-1.5 rounded-lg hover:bg-page transition-colors">
+            <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
-        <div className="flex items-center gap-4 text-[10px]">
+        <div className="flex items-center gap-3 text-[10px]">
           <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-400 inline-block"></span> ≤30d</span>
           <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block"></span> 30–60d</span>
           <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400 inline-block"></span> 60d+</span>
@@ -74,8 +74,11 @@ export default async function CalendarPage({
 
       <div className="bg-surface border border-border rounded-xl overflow-hidden">
         <div className="grid grid-cols-7 bg-page border-b border-border">
-          {weekDays.map(d => (
-            <div key={d} className="text-center text-[10px] font-semibold text-muted uppercase py-3 border-b border-border">{d}</div>
+          {['S','M','T','W','T','F','S'].map((d, i) => (
+            <div key={i} className="text-center text-[9px] md:text-[10px] font-semibold text-muted uppercase py-2 md:py-3 border-b border-border">
+              <span className="md:hidden">{d}</span>
+              <span className="hidden md:inline">{weekDays[i]}</span>
+            </div>
           ))}
         </div>
 
@@ -90,26 +93,26 @@ export default async function CalendarPage({
             const isToday = isSameDay(day, new Date())
 
             return (
-              <div key={key} className="min-h-[6rem] border-b border-r border-gray-50 p-2">
-                <div className={`text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full mb-1 ${
+              <div key={key} className="min-h-[4rem] md:min-h-[6rem] border-b border-r border-gray-50 p-1 md:p-2">
+                <div className={`text-xs font-semibold w-5 h-5 md:w-6 md:h-6 flex items-center justify-center rounded-full mb-0.5 md:mb-1 text-[10px] md:text-xs ${
                   isToday ? 'bg-brand text-white' : 'text-muted'}`}>
                   {format(day, 'd')}
                 </div>
                 <div className="space-y-0.5">
-                  {dayContracts.slice(0, 3).map(c => {
+                  {dayContracts.slice(0, 2).map(c => {
                     const d = daysUntil(c.end_date)
                     const { bg } = urgencyDot(d)
                     return (
                       <Link key={c.id} href={`/contracts/${c.id}`}
-                        className={`flex items-center gap-1 rounded px-1.5 py-0.5 truncate ${bg} hover:opacity-80 transition-opacity`}>
-                        <span className="text-[9px] font-medium leading-tight">
+                        className={`flex items-center gap-1 rounded px-1 py-0.5 truncate ${bg} hover:opacity-80 transition-opacity`}>
+                        <span className="text-[8px] md:text-[9px] font-medium leading-tight truncate">
                           {c.vendor_name}
                         </span>
                       </Link>
                     )
                   })}
-                  {dayContracts.length > 3 && (
-                    <span className="text-[9px] text-muted">+{dayContracts.length - 3} more</span>
+                  {dayContracts.length > 2 && (
+                    <span className="text-[8px] md:text-[9px] text-muted">+{dayContracts.length - 2} more</span>
                   )}
                 </div>
               </div>

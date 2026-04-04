@@ -250,8 +250,8 @@ export default function SettingsPage() {
   const canManageTeam = userRole === 'admin'
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-navy">Settings</h1>
+    <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-5 md:space-y-6">
+      <h1 className="text-xl md:text-2xl font-bold text-navy">Settings</h1>
 
       <div className="bg-surface border border-border rounded-xl p-5 space-y-4">
         <div className="flex items-center justify-between">
@@ -300,18 +300,18 @@ export default function SettingsPage() {
         ) : (
           members.map(m => (
             <div key={m.id} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
-              <div className="flex-1">
-                <p className="text-sm font-medium text-navy">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-navy truncate">
                   {m.display_name || m.profile?.full_name || m.profiles?.full_name || 'Unknown'}
                   {m.user_id === currentUserId ? ' (You)' : ''}
                 </p>
-                <p className="text-sm text-slate-700">{m.profile?.email || m.profiles?.email || 'No email on file'}</p>
+                <p className="text-xs text-slate-500 truncate">{m.profile?.email || m.profiles?.email || 'No email on file'}</p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 ml-3 flex-shrink-0">
                 {canManageTeam ? (
                   <>
-                    <select 
-                      value={m.role} 
+                    <select
+                      value={m.role}
                       onChange={e => changeMemberRole(m.id, e.target.value)}
                       disabled={changingRoleFor === m.id}
                       className="text-xs bg-gray-100 text-slate-600 px-2 py-1 rounded-full border-0 cursor-pointer disabled:opacity-60"
@@ -363,20 +363,22 @@ export default function SettingsPage() {
           return (
             <div className="pt-3 border-t border-border">
               <h3 className="text-sm font-medium text-slate-700 mb-3">Invite teammate</h3>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input value={inviteEmail} onChange={e => setInviteEmail(e.target.value)}
                   type="email" placeholder="colleague@company.com"
-                  className="flex-1 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent" />
-                <select value={inviteRole} onChange={e => setInviteRole(e.target.value)}
-                  className="border border-border rounded-lg px-3 py-2 text-sm bg-surface focus:outline-none">
-                  <option value="editor">Editor</option>
-                  <option value="viewer">Viewer</option>
-                  <option value="admin">Admin</option>
-                </select>
-                <button onClick={sendInvite} disabled={inviteLoading}
-                  className="bg-brand text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-brand-dark transition-colors disabled:opacity-60">
-                  {inviteLoading ? 'Sending…' : 'Invite'}
-                </button>
+                  className="flex-1 border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent" />
+                <div className="flex gap-2">
+                  <select value={inviteRole} onChange={e => setInviteRole(e.target.value)}
+                    className="flex-1 sm:flex-none border border-border rounded-lg px-3 py-2.5 text-sm bg-surface focus:outline-none">
+                    <option value="editor">Editor</option>
+                    <option value="viewer">Viewer</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <button onClick={sendInvite} disabled={inviteLoading}
+                    className="bg-brand text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-brand-dark transition-colors disabled:opacity-60 flex-shrink-0">
+                    {inviteLoading ? 'Sending…' : 'Invite'}
+                  </button>
+                </div>
               </div>
             </div>
           )
