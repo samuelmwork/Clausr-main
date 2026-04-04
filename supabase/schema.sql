@@ -285,10 +285,21 @@ create trigger contract_status_update
 create or replace function public.create_contract_alerts()
 returns trigger language plpgsql security definer as $$
 declare
-  alert_days int[] := array[90, 60, 30, 14, 7, 1];
+  alert_days int[];
+  org_plan text;
   d int;
   alert_date date;
 begin
+  -- Fetch the plan of the organization
+  select plan into org_plan from public.organisations where id = new.org_id;
+
+  -- Set alert days based on plan
+  if org_plan = 'free' then
+    alert_days := array[1];
+  else
+    alert_days := array[90, 60, 30, 14, 7, 1];
+  end if;
+
   -- Delete existing unsent alerts for this contract
   delete from public.alerts
   where contract_id = new.id and sent = false;

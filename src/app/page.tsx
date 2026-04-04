@@ -94,7 +94,7 @@ export default function LandingPage() {
           <p className="text-muted text-center mb-14">Per organisation — not per seat. Your whole team included.</p>
           <div className="grid md:grid-cols-3 gap-7">
             {[
-              { name: 'Free', price: '₹0', period: 'forever', features: ['5 contracts', '1 user', 'Email alerts', 'Calendar view'], cta: 'Start free', highlight: false },
+              { name: 'Free', price: '₹0', period: 'forever', features: ['5 contracts', '1 user', 'Email alerts (1 day)', 'Calendar view'], cta: 'Start free', highlight: false },
               { name: 'Starter', price: '₹999', period: '/month', features: ['25 contracts', '2 users', 'File uploads', 'Smart alerts', 'Dashboard + overall spend'], cta: 'Start Starter', highlight: true },
               { name: 'Pro', price: '₹1,999', period: '/month', features: ['Unlimited contracts', '5 users', 'WhatsApp renewal alerts', 'CSV import', 'Activity log'], cta: 'Start Pro', highlight: false },
             ].map(p => (

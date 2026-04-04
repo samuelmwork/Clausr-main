@@ -16,7 +16,7 @@ const PLANS = [
     features: [
       { text: '1 user', live: true },
       { text: 'Track up to 5 contracts', live: true },
-      { text: 'Renewal email alerts', live: true },
+      { text: 'Renewal email alerts (1 day)', live: true },
       { text: 'Calendar view', live: true },
       { text: 'Dashboard overview', live: true },
     ],
