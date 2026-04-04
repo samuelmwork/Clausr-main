@@ -12,7 +12,7 @@ create table public.organisations (
   id           uuid primary key default uuid_generate_v4(),
   name         text not null,
   plan         text not null default 'free' check (plan in ('free','starter','pro','team')),
-  contract_limit integer not null default 5,
+  contract_limit integer not null default 2,
   razorpay_subscription_id text,
   razorpay_customer_id text,
   subscription_status text default 'inactive',

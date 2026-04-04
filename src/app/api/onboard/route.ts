@@ -177,7 +177,7 @@ export async function POST(req: Request) {
 
       // Create organisation
       const { data: org, error: orgErr } = await supabase
-        .from('organisations').insert({ name: normalizedOrgName, plan: 'free', contract_limit: 5 })
+        .from('organisations').insert({ name: normalizedOrgName, plan: 'free', contract_limit: 2 })
         .select().single()
       if (orgErr) throw orgErr
 

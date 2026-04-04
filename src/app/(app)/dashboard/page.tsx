@@ -69,7 +69,7 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      {org && stats.total >= (org.contract_limit || 5) * 0.8 && (
+      {org && stats.total >= (org.contract_limit || 2) * 0.8 && (
         <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center justify-between">
           <p className="text-amber-800 text-sm">
             <strong>Heads up:</strong> You&apos;re using {stats.total} of {org.contract_limit} contracts on your {org.plan} plan.

@@ -1,8 +1,8 @@
 export const PLAN_LIMITS = {
-  free: 5,
-  starter: 25,
-  pro: 999,
-  team: 9999,
+  free: 2,
+  starter: 10,
+  pro: 25,
+  team: 100,
 } as const
 
 export type BillingPlanId = keyof typeof PLAN_LIMITS

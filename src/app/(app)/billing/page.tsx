@@ -15,7 +15,7 @@ const PLANS = [
     description: 'Try it. No card. No risk.',
     features: [
       { text: '1 user', live: true },
-      { text: 'Track up to 5 contracts', live: true },
+      { text: 'Track up to 2 contracts', live: true },
       { text: 'Renewal email alerts (1 day)', live: true },
       { text: 'Calendar view', live: true },
       { text: 'Dashboard overview', live: true },
@@ -25,12 +25,12 @@ const PLANS = [
   {
     id: 'starter', 
     name: 'STARTER', 
-    priceLabel: '₹999 / month', 
+    priceLabel: '₹399 / month', 
     period: '',
     description: 'For founders who want control without chaos.',
     features: [
       { text: '2 Users', live: true },
-      { text: 'Up to 25 contracts', live: true },
+      { text: 'Up to 10 contracts', live: true },
       { text: 'Upload PDF / DOCX contracts', live: true },
       { text: 'Smart renewal alerts (90/60/30/14/7/1 days)', live: true },
       { text: 'Dashboard + overall spend', live: true },
@@ -40,11 +40,11 @@ const PLANS = [
   {
     id: 'pro', 
     name: 'PRO', 
-    priceLabel: '₹1,999 / month', 
+    priceLabel: '₹799 / month', 
     period: '',
     description: 'For growing teams managing contracts together.',
     features: [
-      { text: 'Unlimited contracts', live: true },
+      { text: 'Up to 25 contracts', live: true },
       { text: 'Up to 5 team members', live: true },
       { text: 'Shared workspace for ops + finance', live: true },
       { text: 'Everything in Starter', live: true },
@@ -96,7 +96,7 @@ export default async function BillingPage() {
     .neq('status', 'cancelled')
 
   const usedContracts = Number(contractCount || 0)
-  const contractLimit = org?.contract_limit || 5
+  const contractLimit = org?.contract_limit || 2
   const isProPlan = currentPlan === 'pro'
   const usageDisplay = isProPlan ? `${usedContracts}` : `${usedContracts} / ${contractLimit}`
   const usagePercent = (Number(contractCount) || 0) / contractLimit

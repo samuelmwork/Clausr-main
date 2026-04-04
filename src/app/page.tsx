@@ -50,7 +50,7 @@ export default function LandingPage() {
             Sign in
           </Link>
         </div>
-        <p className="text-xs text-muted mt-4">Free plan: 5 contracts forever. Upgrade anytime.</p>
+        <p className="text-xs text-muted mt-4">Free plan: 2 contracts forever. Upgrade anytime.</p>
       </section>
 
       <section className="bg-navy py-14">
@@ -58,7 +58,7 @@ export default function LandingPage() {
           {[
             { value: '₹0', label: 'Free plan forever' },
             { value: '10 min', label: 'to set up completely' },
-            { value: '5 contracts', label: 'included on free plan' },
+            { value: '2 contracts', label: 'included on free plan' },
           ].map(s => (
             <div key={s.label}>
               <div className="text-3xl font-bold text-white mb-1">{s.value}</div>
@@ -94,9 +94,9 @@ export default function LandingPage() {
           <p className="text-muted text-center mb-14">Per organisation — not per seat. Your whole team included.</p>
           <div className="grid md:grid-cols-3 gap-7">
             {[
-              { name: 'Free', price: '₹0', period: 'forever', features: ['5 contracts', '1 user', 'Email alerts (1 day)', 'Calendar view'], cta: 'Start free', highlight: false },
-              { name: 'Starter', price: '₹999', period: '/month', features: ['25 contracts', '2 users', 'File uploads', 'Smart alerts', 'Dashboard + overall spend'], cta: 'Start Starter', highlight: true },
-              { name: 'Pro', price: '₹1,999', period: '/month', features: ['Unlimited contracts', '5 users', 'WhatsApp renewal alerts', 'CSV import', 'Activity log'], cta: 'Start Pro', highlight: false },
+              { name: 'Free', price: '₹0', period: 'forever', features: ['2 contracts', '1 user', 'Email alerts (1 day)', 'Calendar view'], cta: 'Start free', highlight: false },
+              { name: 'Starter', price: '₹399', period: '/month', features: ['10 contracts', '2 users', 'File uploads', 'Smart alerts', 'Dashboard + overall spend'], cta: 'Start Starter', highlight: true },
+              { name: 'Pro', price: '₹799', period: '/month', features: ['25 contracts', '5 users', 'WhatsApp renewal alerts', 'CSV import', 'Activity log'], cta: 'Start Pro', highlight: false },
             ].map(p => (
               <div key={p.name} className={`rounded-xl p-6 ${p.highlight ? 'bg-brand text-white' : 'bg-surface border border-border'}`}>
                 <div className={`text-sm font-semibold mb-1 ${p.highlight ? 'text-blue-200' : 'text-muted'}`}>{p.name}</div>
