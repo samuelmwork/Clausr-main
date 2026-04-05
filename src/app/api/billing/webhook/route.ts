@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { createAdminClient } from '@/lib/supabase/server'
-import { getPlanLimit, isPaidPlan } from '@/lib/billing'
+import { getPlanLimit, isPaidPlan, getErrorMessage } from '@/lib/billing'
 
 export const runtime = 'nodejs'
 
@@ -173,8 +173,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true })
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    console.error('Billing webhook error:', message)
+    const message = getErrorMessage(err)
+    console.error('Billing webhook error:', message, err)
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

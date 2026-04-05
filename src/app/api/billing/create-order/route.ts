@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import Razorpay from 'razorpay'
 import { createServiceClient } from '@/lib/supabase/server'
 import { getUserRole } from '@/lib/permissions'
-import { isPaidPlan, getPlanLimit, getRazorpayPlanId } from '@/lib/billing'
+import { isPaidPlan, getPlanLimit, getRazorpayPlanId, getErrorMessage } from '@/lib/billing'
 
 export async function POST(req: Request) {
   try {
@@ -72,15 +72,19 @@ export async function POST(req: Request) {
         await razorpay.subscriptions.cancel(org.razorpay_subscription_id, false)
         console.log(`Cancelled old subscription ${org.razorpay_subscription_id} for org ${orgId}`)
       } catch (cancelErr: unknown) {
-        const errMsg = cancelErr instanceof Error ? cancelErr.message : String(cancelErr)
+        const errorMsg = getErrorMessage(cancelErr)
         // If it's already cancelled/completed, we can safely continue
-        if (!errMsg.includes('cancelled') && !errMsg.includes('completed')) {
-          console.error('Failed to cancel old subscription:', errMsg)
+        const ignoreErrors = ['cancelled', 'completed', 'not found', 'terminated']
+        const shouldIgnore = ignoreErrors.some(term => errorMsg.toLowerCase().includes(term))
+
+        if (!shouldIgnore) {
+          console.error('Failed to cancel old subscription:', errorMsg, cancelErr)
           return NextResponse.json(
-            { error: `Failed to cancel existing subscription before upgrade: ${errMsg}` },
+            { error: `Failed to cancel existing subscription before upgrade: ${errorMsg}` },
             { status: 500 }
           )
         }
+        console.log(`Old subscription ${org.razorpay_subscription_id} already in a terminal state: ${errorMsg}`)
       }
 
       await supabase.from('activity_log').insert({
@@ -127,8 +131,8 @@ export async function POST(req: Request) {
       key: process.env.RAZORPAY_KEY_ID,
     })
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    console.error('Billing order error:', message)
+    const message = getErrorMessage(err)
+    console.error('Billing order error:', message, err)
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

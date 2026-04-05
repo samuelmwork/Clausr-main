@@ -27,3 +27,25 @@ export function getRazorpayPlanId(planId: PaidPlanId): string | null {
 
   return mapping[planId] || null
 }
+
+export function getErrorMessage(err: unknown): string {
+  // Handle standard Error objects
+  if (err instanceof Error) {
+    return err.message
+  }
+
+  // Handle Razorpay error objects and other plain objects
+  if (typeof err === 'object' && err !== null) {
+    const errorObj = err as any
+    
+    // Razorpay standard error structure: { error: { description, code, ... } }
+    if (errorObj.error && typeof errorObj.error === 'object') {
+      return errorObj.error.description || errorObj.error.code || JSON.stringify(errorObj.error)
+    }
+
+    // fallback for objects with message or description
+    return errorObj.message || errorObj.description || JSON.stringify(err)
+  }
+
+  return String(err)
+}

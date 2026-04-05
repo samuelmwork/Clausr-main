@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { createAdminClient } from '@/lib/supabase/server'
-import { isPaidPlan, getPlanLimit } from '@/lib/billing'
+import { isPaidPlan, getPlanLimit, getErrorMessage } from '@/lib/billing'
 
 export async function POST(req: Request) {
   try {
@@ -59,7 +59,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true })
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
+    const message = getErrorMessage(err)
+    console.error('Billing verification error:', message, err)
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
