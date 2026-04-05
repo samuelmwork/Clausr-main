@@ -74,7 +74,8 @@ export async function POST(req: Request) {
       } catch (cancelErr: unknown) {
         const errorMsg = getErrorMessage(cancelErr)
         // If it's already cancelled/completed, we can safely continue
-        const ignoreErrors = ['cancelled', 'completed', 'not found', 'terminated']
+        // We catch "be found" to handle "could not be found" and "invalid" for "The ID provided is invalid"
+        const ignoreErrors = ['cancelled', 'completed', 'not found', 'be found', 'terminated', 'invalid', 'no such']
         const shouldIgnore = ignoreErrors.some(term => errorMsg.toLowerCase().includes(term))
 
         if (!shouldIgnore) {
